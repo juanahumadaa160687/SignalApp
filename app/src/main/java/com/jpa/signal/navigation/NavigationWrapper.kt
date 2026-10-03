@@ -11,7 +11,7 @@ import com.jpa.signal.screens.SignInScreen
 import com.jpa.signal.screens.SignUpScreen
 import com.jpa.signal.screens.HomeScreen
 import com.jpa.signal.screens.ResetPasswordScreen
-import com.jpa.signal.screens.UserProfile
+import com.jpa.signal.screens.UserProfileScreen
 
 @Composable
 fun NavigationWrapper(navHostController: NavHostController, auth: FirebaseAuth) {
@@ -36,7 +36,7 @@ fun NavigationWrapper(navHostController: NavHostController, auth: FirebaseAuth) 
             ResetPasswordScreen(navHostController)
         }
         composable("user-profile") {
-            UserProfile()
+            UserProfileScreen(navHostController, auth)
         }
 
     }
