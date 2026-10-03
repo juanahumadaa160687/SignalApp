@@ -30,7 +30,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -227,7 +226,20 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     Spacer(modifier = Modifier.height(40.dp))
 
                     Button(
-                        onClick = { /* Handle sign in */ },
+                        onClick = {
+                            auth.signInWithEmailAndPassword(email.text.toString(), password.text.toString()).addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    navHostController.navigate("user-profile")
+                                } else {
+                                    println("Error: ${task.exception}")
+                                    println("Error: ${email}")
+
+                                    email.clearText()
+                                    password.clearText()
+                                }
+                            }
+
+                        },
                         modifier =
                             when {
                                 currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()

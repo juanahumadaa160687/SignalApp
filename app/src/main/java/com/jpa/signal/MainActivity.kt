@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         val currentUser = auth.currentUser
         if(currentUser != null){
-            navHostController.navigate("home")
+            auth.signOut()
         }
     }
 }

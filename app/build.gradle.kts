@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.realtime)
 
     implementation(libs.androidx.navifation.compose)
 
