@@ -30,10 +30,10 @@ fun NavigationWrapper(navHostController: NavHostController, auth: FirebaseAuth) 
             HomeScreen(navHostController)
         }
         composable("forgot-password") {
-            ForgotPasswordScreen(navHostController)
+            ForgotPasswordScreen(navHostController, auth)
         }
         composable("reset-password") {
-            ResetPasswordScreen(navHostController)
+            ResetPasswordScreen(navHostController, auth)
         }
         composable("user-profile") {
             UserProfileScreen(navHostController, auth)
