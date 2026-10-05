@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.jpa.signal.navigation.NavigationWrapper
 import com.jpa.signal.ui.theme.SignalTheme
+import com.jpa.signal.ui.theme.background_light
 
 class MainActivity : ComponentActivity() {
 
@@ -35,10 +36,11 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             navHostController = rememberNavController()
+
             SignalTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = background_light
                 ) {
                     NavigationWrapper(navHostController, auth)
                 }

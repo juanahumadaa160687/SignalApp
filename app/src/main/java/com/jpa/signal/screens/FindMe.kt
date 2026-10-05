@@ -1,15 +1,18 @@
 package com.jpa.signal.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.Location
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,7 +29,6 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,29 +36,84 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.firebase.auth.FirebaseAuth
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.jpa.signal.R
 import com.jpa.signal.data.NavItem
-import com.jpa.signal.data.Usuario
-import com.jpa.signal.data.UsuarioRepo
 import com.jpa.signal.ui.theme.background_light
 import com.jpa.signal.ui.theme.tertiary_light
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfileScreen(navHostController: NavHostController, auth: FirebaseAuth){
+fun FindMe(navHostController: NavHostController, auth: FirebaseAuth){
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val fusedLocationClient = remember{ LocationServices.getFusedLocationProviderClient(context) }
 
-    val currentUser = auth.currentUser
+    var userLatLng by remember {mutableStateOf<LatLng?>(null)}
 
-    var usuario: Usuario? by remember { mutableStateOf(Usuario()) }
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(LatLng(-20.21492183013291, -70.13583108234238), 10f)
+    }
 
-    LaunchedEffect(Unit) {
-        usuario = UsuarioRepo.getUsuarioByUid(currentUser!!.uid)
+    var markerState by remember { mutableStateOf<MarkerState?>(null) }
+
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    fun updateMapCamera(latLng: LatLng){
+        userLatLng = latLng
+        markerState = MarkerState(position = latLng)
+        scope.launch {
+          cameraPositionState.animate(
+              CameraUpdateFactory.newLatLngZoom(latLng, 10f)
+          )
+        }
+    }
+    
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { isGranted ->
+        hasLocationPermission = isGranted
+        if(isGranted){
+            try {
+                fusedLocationClient.getCurrentLocation(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    CancellationTokenSource().token
+                ).addOnSuccessListener { location: Location? ->
+                    location?.let {
+                        updateMapCamera(LatLng(it.latitude, it.longitude))
+                    }
+                }
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+            }
+        }
     }
 
     val navItems = listOf(
@@ -191,63 +248,42 @@ fun UserProfileScreen(navHostController: NavHostController, auth: FirebaseAuth){
                 )
             }
 
-        ) { innerPadding ->
+        ) {innerPadding ->
             Column(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LazyColumn(
-                    modifier = Modifier.padding(16.dp).fillMaxSize(),
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.Center
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-
-                    item {
-                        Text(text = "Nombre: ${usuario?.nombre} ${usuario?.apellido}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = cameraPositionState,
+                        properties = MapProperties(
+                            isMyLocationEnabled = hasLocationPermission
+                        ),
+                        uiSettings = MapUiSettings(
+                            zoomControlsEnabled = true,
+                            myLocationButtonEnabled = true,
+                            mapToolbarEnabled = true,
+                            compassEnabled = true
                         )
-                    }
-                    item {
-                        Text(text = "Rut: ${usuario?.rut}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
-                    item {
-                        Text(text = "Edad: ${usuario?.edad}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
-                    item {
-                        Text(text = "Género: ${usuario?.genero}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
-                    item {
-                        Text(text = "Teléfono: ${usuario?.telefono}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
-                    item {
-                        Text(text = "Correo: ${usuario?.correo}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
-                    item {
-                        Text(text = "Dirección: ${usuario?.direccion}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+                    ) {
+                        markerState?.let { state ->
+                            Marker(
+                                state = state,
+                                title = "Mi ubicación",
+                                snippet = "Aquí estoy: ${userLatLng?.latitude}, ${userLatLng?.longitude}",
+                                draggable = true,
+                                icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_marker),
+                                visible = true
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
-

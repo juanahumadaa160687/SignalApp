@@ -13,6 +13,9 @@ service = "4.5.0"
 crashlytics = "3.0.8"
 navigationCompose = "2.10.2"
 material3AdaptiveNavigationSuite = "1.4.0"
+playServicesLocation = "21.4.0"
+playServicesMaps = "20.0.0"
+mapsCompose = "9.0.0"
 
 
 [libraries]
@@ -39,6 +42,11 @@ firebase-realtime = { module = "com.google.firebase:firebase-database" }
 
 androidx-navifation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-compose-material3-adaptive-navigation-suite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite", version.ref = "material3AdaptiveNavigationSuite" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+
+maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -2,7 +2,8 @@ package com.jpa.signal.data
 
 data class NavItem(
     val title: String,
-    val route: String,
+    val function: () -> Unit,
     val icon: Int,
+    val route: String?,
 )
 

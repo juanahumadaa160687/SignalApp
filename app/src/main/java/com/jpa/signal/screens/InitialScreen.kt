@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,7 +55,10 @@ fun InitialScreen(navHostController: NavHostController){
             onClick = {
                 navHostController.navigate("sign-up")
             },
-            modifier = Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 16.dp),
+            modifier = when{
+                currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
+                else -> Modifier.fillMaxWidth(0.5f)
+            }.padding(horizontal = 16.dp).height(56.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = app_cta
             )
@@ -67,10 +72,13 @@ fun InitialScreen(navHostController: NavHostController){
             onClick = {
                 navHostController.navigate("sign-in")
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = "Iniciar Sesión", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.background)
         }
-        Spacer(modifier = Modifier.weight(0.3f))
+        Spacer(modifier = when{
+            currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.weight(0.3f)
+            else -> Modifier.weight(2f)
+        })
     }
 }

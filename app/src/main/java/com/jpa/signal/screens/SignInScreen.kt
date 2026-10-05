@@ -17,6 +17,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +46,9 @@ import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.R
 import com.jpa.signal.ui.theme.app_gradient
+import com.jpa.signal.ui.theme.background_light
+import com.jpa.signal.ui.theme.primary_light
+import com.jpa.signal.ui.theme.tertiary_light
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,30 +61,23 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = background_light,
 
         topBar = {
             TopAppBar(
                 title = { Text(
                     text = "Inicio de Sesión",
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.background) },
-                modifier = Modifier.background(
-                    Brush.verticalGradient(
-                        colors = app_gradient,
-                        startY = 0f,
-                        endY = Float.POSITIVE_INFINITY
-                    )
-                ),
+                    color = background_light) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
+                    containerColor = tertiary_light
                 ),
                 navigationIcon = {
                     IconButton(onClick = { navHostController.popBackStack() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_back),
                             contentDescription = "Volver",
-                            tint = MaterialTheme.colorScheme.background,
+                            tint = background_light,
                             modifier = Modifier.requiredSize(24.dp)
                         )
                     }
@@ -116,25 +113,25 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
                             width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = primary_light,
                             shape = MaterialTheme.shapes.large
                         ),
                         shape = MaterialTheme.shapes.large,
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = background_light,
+                            unfocusedContainerColor = background_light,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = primary_light,
+                            unfocusedTextColor = tertiary_light,
                             focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                            unfocusedPlaceholderColor = primary_light
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_email),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primary_light,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -145,7 +142,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_clear),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primary_light,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -167,25 +164,25 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
+                                color = primary_light,
                                 shape = MaterialTheme.shapes.large
                         ),
                         shape = MaterialTheme.shapes.large,
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = background_light,
+                            unfocusedContainerColor = background_light,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = primary_light,
+                            unfocusedTextColor = tertiary_light,
                             focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                            unfocusedPlaceholderColor = primary_light
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_pass),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primary_light,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -196,7 +193,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 Icon(
                                     painter = painterResource(id = if (showPassword) R.drawable.ic_visibility else R.drawable.ic_visibility_off),
                                     contentDescription = "Mostrar - ocultar contraseña",
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primary_light,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -216,7 +213,8 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                         TextButton(
                             onClick = { navHostController.navigate("forgot-password") },
                         ) {
-                            Text("¿Olvidaste tu contraseña?")
+                            Text("¿Olvidaste tu contraseña?",
+                                color = primary_light)
                         }
                     }
                 }
@@ -229,7 +227,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                         onClick = {
                             auth.signInWithEmailAndPassword(email.text.toString(), password.text.toString()).addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    navHostController.navigate("user-profile")
+                                    navHostController.navigate("home")
                                 } else {
                                     println("Error: ${task.exception}")
                                     println("Error: ${email}")
@@ -245,9 +243,12 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }
-                            .height(56.dp)
+                            .height(56.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = tertiary_light
+                        )
                     ) {
-                        Text("Iniciar Sesión")
+                        Text("Iniciar Sesión", color = background_light)
                     }
                 }
 
@@ -263,7 +264,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }
                     ) {
-                        Text("¿No tienes una cuenta? Regístrate")
+                        Text("¿No tienes una cuenta? Regístrate", color = primary_light)
                     }
                 }
             }
