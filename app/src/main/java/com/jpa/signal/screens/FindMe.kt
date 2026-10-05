@@ -72,7 +72,7 @@ fun FindMe(navHostController: NavHostController, auth: FirebaseAuth){
     var userLatLng by remember {mutableStateOf<LatLng?>(null)}
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(-20.21492183013291, -70.13583108234238), 10f)
+        position = CameraPosition.fromLatLngZoom(LatLng(-20.21492183013291, -70.13583108234238), 20f)
     }
 
     var markerState by remember { mutableStateOf<MarkerState?>(null) }
