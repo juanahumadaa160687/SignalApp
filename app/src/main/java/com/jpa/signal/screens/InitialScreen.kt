@@ -121,42 +121,7 @@ fun InitialScreen(navHostController: NavHostController){
                 )
             }
         }
-        item {
-            Spacer(modifier = Modifier.height(28.dp))
-        }
 
-
-        item{
-            Button(
-                onClick = { /*TODO: Continuar con Google*/ },
-                modifier = when{
-                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier
-                        .height(48.dp)
-                        .fillMaxWidth()
-                        .padding(horizontal = 32.dp)
-                    else -> Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(0.5f)
-                        .padding(horizontal = 32.dp)
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black),
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_google),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-                Text(
-                    text = "Continuar con Google",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
         item {
             Spacer(modifier = Modifier.height(28.dp))
         }

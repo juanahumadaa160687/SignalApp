@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationItemColors
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -74,14 +75,15 @@ import kotlinx.coroutines.launch
 *
 */
 @Composable
-
 fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) {
 
+    //Variables para obtener el usuario actual
     val currentUser = auth.currentUser
     val scope = rememberCoroutineScope()
     val userUid = currentUser?.uid
     var editedUsuario: Usuario by remember { mutableStateOf( Usuario()) }
 
+    //Obtener el usuario actual
     LaunchedEffect(Unit) {
         val usuario = UsuarioRepo.getUsuarioByUid(userUid!!)
         if (usuario != null) {
@@ -89,12 +91,13 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
         }
     }
 
-    val rut = rememberTextFieldState(editedUsuario.rut)
-    val nombre = rememberTextFieldState(editedUsuario.nombre)
-    val apellido = rememberTextFieldState(editedUsuario.apellido)
-    val edad = rememberTextFieldState(editedUsuario.edad)
-    val telefono = rememberTextFieldState(editedUsuario.telefono)
-    val direccion = rememberTextFieldState(editedUsuario.direccion)
+    //Variables para los campos de texto
+    var rut by remember { mutableStateOf(editedUsuario.rut) }
+    var nombre by remember { mutableStateOf(editedUsuario.nombre) }
+    var apellido by remember { mutableStateOf(editedUsuario.apellido) }
+    var edad by remember { mutableStateOf(editedUsuario.edad) }
+    var telefono by remember { mutableStateOf(editedUsuario.telefono) }
+    var direccion by remember { mutableStateOf(editedUsuario.direccion) }
 
     val navItems = listOf(
         NavItem(
@@ -142,7 +145,7 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                 onDismissRequest = { openAlertDialog.value = false },
                 title = {
                     Text(
-                        "Error en el registro",
+                        "Error al actualizar el perfil",
                         fontFamily = FontFamily.Default,
                         fontWeight = FontWeight.Normal,
                         fontSize = 22.sp,
@@ -296,7 +299,7 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                 verticalArrangement = Arrangement.Center
             ) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(vertical = 8.dp),
+                    modifier = Modifier.fillMaxSize().padding(vertical = 8.dp, horizontal = 16.dp),
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -304,7 +307,8 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                         Spacer(modifier = Modifier.height(40.dp))
 
                         TextField(
-                            state = rut,
+                            value = editedUsuario.rut,
+                            onValueChange = { editedUsuario = editedUsuario.copy(rut = it) },
                             placeholder = { Text("RUT") },
 
                             modifier =
@@ -337,7 +341,7 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                             },
                             trailingIcon = {
                                 IconButton(
-                                    onClick = { rut.clearText() },
+                                    onClick = { rut = "" },
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_clear),
@@ -354,7 +358,8 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                         Spacer(modifier = Modifier.height(40.dp))
 
                         TextField(
-                            state = nombre,
+                            value = editedUsuario.nombre,
+                            onValueChange = { editedUsuario = editedUsuario.copy(nombre = it) },
                             placeholder = { Text("Nombre") },
 
                             modifier =
@@ -387,7 +392,7 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                             },
                             trailingIcon = {
                                 IconButton(
-                                    onClick = { nombre.clearText() },
+                                    onClick = { nombre = "" },
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_clear),
@@ -404,7 +409,8 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                         Spacer(modifier = Modifier.height(40.dp))
 
                         TextField(
-                            state = apellido,
+                            value = editedUsuario.apellido,
+                            onValueChange = { editedUsuario = editedUsuario.copy(apellido = it) },
                             placeholder = { Text("Apellido") },
 
                             modifier =
@@ -437,7 +443,7 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                             },
                             trailingIcon = {
                                 IconButton(
-                                    onClick = { apellido.clearText() },
+                                    onClick = { apellido = "" },
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_clear),
@@ -454,7 +460,8 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                         Spacer(modifier = Modifier.height(40.dp))
 
                         TextField(
-                            state = edad,
+                            value = editedUsuario.edad,
+                            onValueChange = { editedUsuario = editedUsuario.copy(edad = it) },
                             placeholder = { Text("Edad") },
 
                             modifier =
@@ -487,7 +494,7 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                             },
                             trailingIcon = {
                                 IconButton(
-                                    onClick = { edad.clearText() },
+                                    onClick = { edad = "" },
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_clear),
@@ -504,7 +511,8 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                         Spacer(modifier = Modifier.height(40.dp))
 
                         TextField(
-                            state = telefono,
+                            value = editedUsuario.telefono,
+                            onValueChange = { editedUsuario = editedUsuario.copy(telefono = it) },
                             placeholder = { Text("Número de teléfono") },
 
                             modifier =
@@ -537,7 +545,7 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                             },
                             trailingIcon = {
                                 IconButton(
-                                    onClick = { telefono.clearText() },
+                                    onClick = { telefono = "" },
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_clear),
@@ -554,7 +562,8 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                         Spacer(modifier = Modifier.height(40.dp))
 
                         TextField(
-                            state = direccion,
+                            value = editedUsuario.direccion,
+                            onValueChange = { editedUsuario = editedUsuario.copy(direccion = it) },
                             placeholder = { Text("Dirección") },
 
                             modifier =
@@ -587,7 +596,7 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                             },
                             trailingIcon = {
                                 IconButton(
-                                    onClick = { direccion.clearText() },
+                                    onClick = { direccion = "" },
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_clear),
@@ -631,7 +640,7 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                                     RadioButton(
                                         selected = (text == selectedOption),
                                         onClick = null,
-                                        colors = androidx.compose.material3.RadioButtonDefaults.colors(
+                                        colors = RadioButtonDefaults.colors(
                                             selectedColor = primary_light,
                                             unselectedColor = primary_light
                                         )
@@ -653,12 +662,16 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
 
                     item {
                         Button(
-                            onClick = { scope.launch {
+                            onClick = {
+                                scope.launch {
                                 UsuarioRepo.updateUsuario(userUid!!, editedUsuario)
+                                navHostController.navigate("user-profile")
                             } },
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(16.dp).fillMaxWidth().height(56.dp)
                         ){
-
+                            Text(
+                                text = "Guardar",
+                            )
                         }
                     }
                 }
