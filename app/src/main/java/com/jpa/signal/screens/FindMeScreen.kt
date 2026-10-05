@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,7 +63,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FindMe(navHostController: NavHostController, auth: FirebaseAuth){
+fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val fusedLocationClient = remember{ LocationServices.getFusedLocationProviderClient(context) }
@@ -214,7 +213,7 @@ fun FindMe(navHostController: NavHostController, auth: FirebaseAuth){
                 TopAppBar(
                     title = {
                         Text(
-                            text = "Perfil de Usuario",
+                            text = "Encuéntrame",
                             style = MaterialTheme.typography.titleLarge,
                             color = background_light
                         )

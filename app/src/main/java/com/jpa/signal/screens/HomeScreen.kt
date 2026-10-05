@@ -1,6 +1,7 @@
 package com.jpa.signal.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalGridApi
@@ -202,7 +203,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                             },
                     ){
                         Card(
-                            modifier = Modifier.padding(16.dp).fillMaxSize(),
+                            modifier = Modifier.padding(16.dp).fillMaxSize().clickable(onClick = { navHostController.navigate("text-to-audio") }),
                             colors = CardDefaults.cardColors(
                                 containerColor = neutral_tonal_light
                             ),
@@ -235,7 +236,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                             }
                         }
                         Card(
-                            modifier = Modifier.padding(16.dp).fillMaxSize(),
+                            modifier = Modifier.padding(16.dp).fillMaxSize().clickable(onClick = { navHostController.navigate("audio-to-text") }),
                             colors = CardDefaults.cardColors(
                                 containerColor = primary_tonal_light
                             ),
@@ -269,7 +270,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                             }
                         }
                         Card(
-                            modifier = Modifier.padding(16.dp).fillMaxSize(),
+                            modifier = Modifier.padding(16.dp).fillMaxSize().clickable(onClick = { navHostController.navigate("find") }),
                             colors = CardDefaults.cardColors(
                                 containerColor = secondary_tonal_light
                             ),
@@ -302,7 +303,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                             }
                         }
                         Card(
-                            modifier = Modifier.padding(16.dp).fillMaxSize(),
+                            modifier = Modifier.padding(16.dp).fillMaxSize().clickable(onClick = { navHostController.navigate("user-profile") }),
                             colors = CardDefaults.cardColors(
                                 containerColor = tertiary_tonal_light
                             ),

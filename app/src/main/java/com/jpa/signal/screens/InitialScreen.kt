@@ -27,6 +27,7 @@ import androidx.navigation.NavHostController
 import com.jpa.signal.R
 import com.jpa.signal.ui.theme.app_cta
 import com.jpa.signal.ui.theme.app_gradient
+import com.jpa.signal.ui.theme.background_light
 
 @Composable
 fun InitialScreen(navHostController: NavHostController){
@@ -63,7 +64,7 @@ fun InitialScreen(navHostController: NavHostController){
                 containerColor = app_cta
             )
         ){
-            Text(text = "Registrarse", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.background)
+            Text(text = "Registrarse", style = MaterialTheme.typography.labelLarge, color = background_light)
 
         }
 
@@ -74,7 +75,7 @@ fun InitialScreen(navHostController: NavHostController){
             },
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(text = "Iniciar Sesión", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.background)
+            Text(text = "Iniciar Sesión", style = MaterialTheme.typography.labelLarge, color = background_light)
         }
         Spacer(modifier = when{
             currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.weight(0.3f)

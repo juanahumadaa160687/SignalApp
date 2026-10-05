@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.screens.AudioToText
-import com.jpa.signal.screens.FindMe
+import com.jpa.signal.screens.FindMeScreen
 import com.jpa.signal.screens.ForgotPasswordScreen
 import com.jpa.signal.screens.InitialScreen
 import com.jpa.signal.screens.SignInScreen
@@ -45,10 +45,10 @@ fun NavigationWrapper(navHostController: NavHostController, auth: FirebaseAuth) 
             AudioToText(navHostController)
         }
         composable("text-to-audio") {
-            TextToAudio(navHostController)
+            TextToAudio(navHostController, auth)
         }
         composable("find") {
-            FindMe(navHostController, auth)
+            FindMeScreen(navHostController, auth)
         }
     }
 }
