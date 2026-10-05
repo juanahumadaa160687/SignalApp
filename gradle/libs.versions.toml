@@ -47,7 +47,6 @@ play-services-maps = { module = "com.google.android.gms:play-services-maps", ver
 
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
 
-kotlinx-flow = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-flow", version = "1.6.4" }
 
 
 [plugins]

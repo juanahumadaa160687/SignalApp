@@ -40,8 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.R
@@ -52,16 +55,23 @@ import com.jpa.signal.ui.theme.tertiary_light
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
+
+/*Pantalla de Texto a Voz
+*
+*  @input: navHostController: Controlador de navegación de Jetpack Compose y auth: Instancia de FirebaseAuth para autenticación.
+*  @output: Pantalla de registro con campos de texto para ingresar el texto a convertir en audio y el botón para convertirlo.
+*
+*/
 @Composable
 fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
 
+    //Variables para el transcrito de texto a audio
     val context = LocalContext.current
     var textToSpeak by remember { mutableStateOf("") }
-
     var textToSpeech by remember { mutableStateOf<TextToSpeech?>(null) }
     var isInitialized by remember { mutableStateOf(false) }
 
-
+    //Inicialización de la API de TextToSpeech
     DisposableEffect(Unit) {
         /*
         * Para la correcta imprementación de la API de TextToSpeech, el emulador o el dispositivo final del usuario deben estar configurado con el idioma de preferencia del usuario
@@ -72,6 +82,12 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
                 isInitialized = true
             }
         }
+        /*
+        * Se establece el idioma de la API de TextToSpeech al idioma predeterminado del dispositivo del usuario
+        * Esto permite que la API de TextToSpeech funcione correctamente con el idioma del usuario
+        * Para obtener el idioma del usuario, se utiliza la clase Locale,
+        * es necesario, modificar el idioma del dispositivo a español para utilizarlo en el idioma predeterminado por el usuario
+         */
         val languages = tts.setLanguage(Locale.getDefault())
         if (languages == TextToSpeech.LANG_MISSING_DATA || languages == TextToSpeech.LANG_NOT_SUPPORTED) {
             isInitialized = false
@@ -124,8 +140,8 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
         primaryActionContentHorizontalAlignment = Alignment.Start,
         navigationItemVerticalArrangement = Arrangement.Center,
         navigationSuiteColors = NavigationSuiteDefaults.colors(
-            navigationBarContainerColor = tertiary_light,
-            navigationRailContainerColor = tertiary_light,
+            navigationBarContainerColor = primary_light,
+            navigationRailContainerColor = primary_light,
         ),
         navigationItems = {
             navItems.forEach { item ->
@@ -134,11 +150,11 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
                         Text(
                             text = item.title,
                             textAlign = TextAlign.Center,
-                            style =
-                                when {
-                                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> MaterialTheme.typography.labelLarge
-                                    else -> MaterialTheme.typography.labelMedium
-                                },
+                            fontFamily = FontFamily.Default,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp,
+                            lineHeight = 20.sp,
+                            letterSpacing = 0.1.sp
                         )
                     },
                     icon = {
@@ -184,12 +200,16 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
                     title = {
                         Text(
                             text = "Texto a Voz",
-                            style = MaterialTheme.typography.titleLarge,
+                            fontFamily = FontFamily.Default,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 22.sp,
+                            lineHeight = 28.sp,
+                            letterSpacing = 0.sp,
                             color = background_light
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = tertiary_light
+                        containerColor = primary_light
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navHostController.popBackStack() }) {
@@ -209,7 +229,7 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
                                 painter = painterResource(id = R.drawable.ic_user),
                                 contentDescription = "Perfil de Usuario",
                                 tint = background_light,
-                                modifier = Modifier.requiredSize(24.dp)
+                                modifier = Modifier.requiredSize(32.dp)
                             )
 
                         }
@@ -244,14 +264,14 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
                         ),
                     shape = MaterialTheme.shapes.large,
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                        unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                        focusedTextColor = tertiary_light,
+                        unfocusedTextColor = primary_light,
                         focusedPlaceholderColor = Color.Gray,
-                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                        unfocusedPlaceholderColor = primary_light
                     ),
                     trailingIcon = {
                         IconButton(
@@ -276,6 +296,7 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
                 ) {
                     IconButton(
                         onClick = {
+                            // Convertir el texto a audio
                             if (isInitialized) {
                                 textToSpeech?.speak(
                                     textToSpeak,

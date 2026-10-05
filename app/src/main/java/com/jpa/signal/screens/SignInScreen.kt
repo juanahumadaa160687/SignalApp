@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.foundation.text.input.clearText
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,23 +42,81 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.R
 import com.jpa.signal.ui.theme.app_gradient
 import com.jpa.signal.ui.theme.background_light
 import com.jpa.signal.ui.theme.primary_light
+import com.jpa.signal.ui.theme.surface_light
 import com.jpa.signal.ui.theme.tertiary_light
 
 @OptIn(ExperimentalMaterial3Api::class)
+
+/*Pantalla de inicio de sesión
+*
+*  @input: navHostController: Controlador de navegación de Jetpack Compose y auth: Instancia de FirebaseAuth para autenticación.
+*  @output: Pantalla de inicio de sesión con campos de texto para el correo electrónico y la contraseña, botones para iniciar sesión y registrarse.
+*
+*/
 @Composable
 fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
+
+    /*
+    Variables para el inicio de sesión
+    email: Correo electrónico del usuario
+    password: Contraseña del usuario
+    showPassword: Variable para mostrar o ocultar la contraseña
+    */
 
     var email = remember { TextFieldState("") }
     var password  = remember { TextFieldState("") }
 
     var showPassword by remember { mutableStateOf(false) }
+
+    var text by remember { mutableStateOf("") }
+
+    //Variable que controla la visibilidad del AlertDialog
+    val openAlertDialog = remember { mutableStateOf(false) }
+
+    //Si la variable openAlertDialog es true, se muestra el AlertDialog
+    when {
+        openAlertDialog.value -> {
+            AlertDialog(
+                onDismissRequest = { openAlertDialog.value = false },
+                title = { Text("Error",
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 22.sp,
+                    lineHeight = 28.sp,
+                    letterSpacing = 0.sp,
+                    color = tertiary_light) },
+                text = { Text(
+                    text = text,
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
+                    letterSpacing = 0.5.sp,
+                    textAlign = TextAlign.Center,
+                    color = primary_light) },
+                confirmButton = {
+                    TextButton(onClick = { openAlertDialog.value = false }) {
+                        Text("Aceptar")
+                    }
+                },
+                icon = { Icon(painter = painterResource(id = R.drawable.ic_error), contentDescription = null, modifier = Modifier.requiredSize(32.dp)) },
+                containerColor = surface_light,
+                textContentColor = primary_light,
+                titleContentColor = tertiary_light,
+            )
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -67,11 +126,16 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
             TopAppBar(
                 title = { Text(
                     text = "Inicio de Sesión",
-                    style = MaterialTheme.typography.titleLarge,
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 22.sp,
+                    lineHeight = 28.sp,
+                    letterSpacing = 0.sp,
                     color = background_light) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = tertiary_light
+                    containerColor = primary_light
                 ),
+
                 navigationIcon = {
                     IconButton(onClick = { navHostController.popBackStack() }) {
                         Icon(
@@ -106,7 +170,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     TextField(
                         state = email,
                         placeholder = { Text("Correo electrónico") },
-
+                        // Modificador que permite ajustar el tamaño del TextField de acuerdo a la orientación de la pantalla
                         modifier =
                             when{
                                 currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
@@ -158,6 +222,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     SecureTextField(
                         state = password,
                         placeholder = { Text("Contraseña") },
+                        // Modificador que permite ajustar el tamaño del TextField de acuerdo a la orientación de la pantalla
                         modifier =
                             when {
                                 currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
@@ -203,6 +268,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                 }
                 item{
                     Row(
+                        // Modificador que permite ajustar el tamaño del Link de acuerdo a la orientación de la pantalla
                         modifier =
                             when {
                                 currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
@@ -224,20 +290,27 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     Spacer(modifier = Modifier.height(40.dp))
 
                     Button(
+                        // Función que permite iniciar sesión con el correo electrónico y la contraseña ingresados
                         onClick = {
-                            auth.signInWithEmailAndPassword(email.text.toString(), password.text.toString()).addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    navHostController.navigate("home")
+                            if (email.text.isNotEmpty() && password.text.isNotEmpty()) {
+                                auth.signInWithEmailAndPassword(
+                                    email.text.toString(),
+                                    password.text.toString()
+                                )
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            navHostController.navigate("home")
+                                        } else {
+                                            text = "El correo electrónico o la contraseña son incorrectos."
+                                            openAlertDialog.value = true
+                                        }
+                                    }
                                 } else {
-                                    println("Error: ${task.exception}")
-                                    println("Error: ${email}")
-
-                                    email.clearText()
-                                    password.clearText()
-                                }
+                                    text = "Por favor, ingrese un correo electrónico y una contraseña."
+                                    openAlertDialog.value = true
                             }
-
                         },
+                        // Modificador que permite ajustar el tamaño del Botón de acuerdo a la orientación de la pantalla
                         modifier =
                             when {
                                 currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
@@ -245,7 +318,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                             }
                             .height(56.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = tertiary_light
+                            containerColor = primary_light
                         )
                     ) {
                         Text("Iniciar Sesión", color = background_light)
@@ -256,8 +329,10 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
 
                     Spacer(modifier = Modifier.height(36.dp))
 
+
                     TextButton(
                         onClick = { navHostController.navigate("sign-up") },
+                        // Modificador que permite ajustar el tamaño del TextButton de acuerdo a la orientación de la pantalla
                         modifier =
                             when {
                                 currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()

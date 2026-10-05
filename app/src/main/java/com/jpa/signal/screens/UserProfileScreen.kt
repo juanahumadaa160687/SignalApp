@@ -1,12 +1,19 @@
 package com.jpa.signal.screens
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,9 +41,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.R
@@ -44,6 +56,7 @@ import com.jpa.signal.data.NavItem
 import com.jpa.signal.data.Usuario
 import com.jpa.signal.data.UsuarioRepo
 import com.jpa.signal.ui.theme.background_light
+import com.jpa.signal.ui.theme.primary_light
 import com.jpa.signal.ui.theme.tertiary_light
 import kotlinx.coroutines.launch
 
@@ -52,6 +65,8 @@ import kotlinx.coroutines.launch
 fun UserProfileScreen(navHostController: NavHostController, auth: FirebaseAuth){
 
     val currentUser = auth.currentUser
+
+    val scope = rememberCoroutineScope()
 
     var usuario: Usuario? by remember { mutableStateOf(Usuario()) }
 
@@ -98,8 +113,8 @@ fun UserProfileScreen(navHostController: NavHostController, auth: FirebaseAuth){
         primaryActionContentHorizontalAlignment = Alignment.Start,
         navigationItemVerticalArrangement = Arrangement.Center,
         navigationSuiteColors = NavigationSuiteDefaults.colors(
-            navigationBarContainerColor = tertiary_light,
-            navigationRailContainerColor = tertiary_light,
+            navigationBarContainerColor = primary_light,
+            navigationRailContainerColor = primary_light,
         ),
         navigationItems = {
             navItems.forEach { item ->
@@ -108,11 +123,11 @@ fun UserProfileScreen(navHostController: NavHostController, auth: FirebaseAuth){
                         Text(
                             text = item.title,
                             textAlign = TextAlign.Center,
-                            style =
-                                when {
-                                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> MaterialTheme.typography.labelLarge
-                                    else -> MaterialTheme.typography.labelMedium
-                                },
+                            fontFamily = FontFamily.Default,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp,
+                            lineHeight = 20.sp,
+                            letterSpacing = 0.1.sp
                         )
                     },
                     icon = {
@@ -158,12 +173,16 @@ fun UserProfileScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     title = {
                         Text(
                             text = "Perfil de Usuario",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = background_light
+                            fontFamily = FontFamily.Default,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 22.sp,
+                            lineHeight = 28.sp,
+                            letterSpacing = 0.sp,
+                            color = background_light,
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = tertiary_light
+                        containerColor = primary_light
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navHostController.popBackStack() }) {
@@ -183,7 +202,7 @@ fun UserProfileScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 painter = painterResource(id = R.drawable.ic_user),
                                 contentDescription = "Perfil de Usuario",
                                 tint = background_light,
-                                modifier = Modifier.requiredSize(24.dp)
+                                modifier = Modifier.requiredSize(32.dp)
                             )
 
                         }
@@ -198,52 +217,332 @@ fun UserProfileScreen(navHostController: NavHostController, auth: FirebaseAuth){
                 verticalArrangement = Arrangement.Center
             ) {
                 LazyColumn(
-                    modifier = Modifier.padding(16.dp).fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().padding(vertical = 8.dp),
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.Center
-                ) {
+                ){
+                    stickyHeader {
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().background(primary_light).padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "Nombre",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                lineHeight = 24.sp,
+                                letterSpacing = 0.1.sp,
+                                color = background_light,
+                            )
+                        }
+                    }
+                    item {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "${usuario?.nombre} ${usuario?.apellido}",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 28.sp,
+                                lineHeight = 36.sp,
+                                letterSpacing = 0.sp,
+                                color = primary_light,
+                            )
+                        }
+                    }
+
+                    stickyHeader {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().background(primary_light).padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "Email",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                lineHeight = 24.sp,
+                                letterSpacing = 0.1.sp,
+                                color = background_light,
+                            )
+                        }
+                    }
+                    item {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "${usuario?.correo}",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 28.sp,
+                                lineHeight = 36.sp,
+                                letterSpacing = 0.sp,
+                                color = primary_light,
+                            )
+                        }
+                    }
+
+                    stickyHeader {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().background(primary_light).padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "RUT",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                lineHeight = 24.sp,
+                                letterSpacing = 0.1.sp,
+                                color = background_light,
+                            )
+                        }
+                    }
+                    item {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "${usuario?.rut}",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 28.sp,
+                                lineHeight = 36.sp,
+                                letterSpacing = 0.sp,
+                                color = primary_light,
+                            )
+                        }
+                    }
+
+                    stickyHeader {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().background(primary_light).padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "Edad",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                lineHeight = 24.sp,
+                                letterSpacing = 0.1.sp,
+                                color = background_light,
+                            )
+                        }
+                    }
+                    item {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "${usuario?.edad} años",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 28.sp,
+                                lineHeight = 36.sp,
+                                letterSpacing = 0.sp,
+                                color = primary_light,
+                            )
+                        }
+                    }
+
+                    stickyHeader {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().background(primary_light).padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "Género",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                lineHeight = 24.sp,
+                                letterSpacing = 0.1.sp,
+                                color = background_light,
+                            )
+                        }
+                    }
 
                     item {
-                        Text(text = "Nombre: ${usuario?.nombre} ${usuario?.apellido}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "${usuario?.genero}",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 28.sp,
+                                lineHeight = 36.sp,
+                                letterSpacing = 0.sp,
+                                color = primary_light,
+                            )
+                        }
                     }
-                    item {
-                        Text(text = "Rut: ${usuario?.rut}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+
+                    stickyHeader {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().background(primary_light).padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "Teléfono",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                lineHeight = 24.sp,
+                                letterSpacing = 0.1.sp,
+                                color = background_light,
+                            )
+                        }
                     }
+
                     item {
-                        Text(text = "Edad: ${usuario?.edad}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "${usuario?.telefono}",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 28.sp,
+                                lineHeight = 36.sp,
+                                letterSpacing = 0.sp,
+                                color = primary_light,
+                            )
+                        }
                     }
-                    item {
-                        Text(text = "Género: ${usuario?.genero}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+
+                    stickyHeader {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().background(primary_light).padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "Dirección",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                lineHeight = 24.sp,
+                                letterSpacing = 0.1.sp,
+                                color = background_light,
+                            )
+                        }
                     }
+
                     item {
-                        Text(text = "Teléfono: ${usuario?.telefono}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "${usuario?.direccion}",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 28.sp,
+                                lineHeight = 36.sp,
+                                letterSpacing = 0.sp,
+                                color = primary_light,
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
                     }
+
                     item {
-                        Text(text = "Correo: ${usuario?.correo}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
-                    item {
-                        Text(text = "Dirección: ${usuario?.direccion}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
+
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(end = 16.dp)
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        navHostController.navigate("edit-profile")
+                                    },
+                                    modifier = Modifier.size(54.dp).background(color = primary_light, shape = RoundedCornerShape(12.dp))
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_edit),
+                                        contentDescription = "Editar Perfil",
+                                        tint = background_light,
+                                        modifier = Modifier.requiredSize(28.dp)
+                                    )
+                                }
+                            }
+
+                            Column(
+
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        scope.launch {
+                                            UsuarioRepo.deleteUsuario(currentUser!!.uid)
+                                            navHostController.navigate("initial")
+                                        }
+                                    },
+                                    modifier = Modifier.size(54.dp).background(color = Color.Red, shape = RoundedCornerShape(12.dp))
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_delete),
+                                        contentDescription = "Editar Perfil",
+                                        tint = background_light,
+                                        modifier = Modifier.requiredSize(28.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

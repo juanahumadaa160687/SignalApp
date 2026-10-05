@@ -35,8 +35,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.R
@@ -44,17 +47,28 @@ import com.jpa.signal.data.NavItem
 import com.jpa.signal.ui.theme.app_gradient
 import com.jpa.signal.ui.theme.background_light
 import com.jpa.signal.ui.theme.neutral_tonal_light
+import com.jpa.signal.ui.theme.primary_light
 import com.jpa.signal.ui.theme.primary_tonal_light
 import com.jpa.signal.ui.theme.secondary_tonal_light
+import com.jpa.signal.ui.theme.surface_light
 import com.jpa.signal.ui.theme.tertiary_light
 import com.jpa.signal.ui.theme.tertiary_tonal_light
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGridApi::class)
+
+/*Pantalla Home
+*
+*  @input: navHostController: Controlador de navegación de Jetpack Compose y auth: Instancia de FirebaseAuth para autenticación.
+*  @output: Pantalla home con botones para navegar a las pantallas de texto a audio, audio a texto, geolocalización y perfil de usuario.
+*
+*/
 @Composable
 fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
 
+    //Variable para el Scaffold que contiene la Navigation Suite para mostrar una barra de navegación de acuerdo con el tamaño de la pantalla
     val state = rememberNavigationSuiteScaffoldState()
 
+    //Lista de items para la Navigation Suite
     val navItems = listOf(
         NavItem(
             title = "Home",
@@ -86,6 +100,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
     NavigationSuiteScaffold(
         modifier = Modifier.fillMaxSize(),
         navigationSuiteType = when {
+            //Barras de navegación de acuerdo con el tamaño de la pantalla
             currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> NavigationSuiteType.NavigationBar
             else -> NavigationSuiteType.NavigationRail
         },
@@ -93,21 +108,22 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
         primaryActionContentHorizontalAlignment = Alignment.Start,
         navigationItemVerticalArrangement = Arrangement.Center,
         navigationSuiteColors = NavigationSuiteDefaults.colors(
-            navigationBarContainerColor = tertiary_light,
-            navigationRailContainerColor = tertiary_light,
+            navigationBarContainerColor = primary_light,
+            navigationRailContainerColor = primary_light,
         ),
         navigationItems = {
+            //Se asigna cada item a la Navigation Suite
             navItems.forEach { item ->
                 NavigationSuiteItem(
                     label = {
                         Text(
                             text = item.title,
                             textAlign = TextAlign.Center,
-                            style =
-                                when {
-                                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> MaterialTheme.typography.labelLarge
-                                    else -> MaterialTheme.typography.labelMedium
-                                },
+                            fontFamily = FontFamily.Default,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp,
+                            lineHeight = 20.sp,
+                            letterSpacing = 0.1.sp
                         )
                     },
                     icon = {
@@ -151,12 +167,16 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
             topBar = {
                 TopAppBar(
                     title = { Text(
-                        text = "Home",
-                        style = MaterialTheme.typography.titleLarge,
+                        text = "Bienvenido a Signl App",
+                        fontFamily = FontFamily.Default,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 22.sp,
+                        lineHeight = 28.sp,
+                        letterSpacing = 0.sp,
                         color = background_light
                     )},
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = tertiary_light
+                        containerColor = primary_light
                     ),
                     navigationIcon = {
                         IconButton(onClick = { navHostController.popBackStack() }) {
@@ -176,7 +196,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                                 painter = painterResource(id = R.drawable.ic_user),
                                 contentDescription = "Perfil de Usuario",
                                 tint = background_light,
-                                modifier = Modifier.requiredSize(24.dp)
+                                modifier = Modifier.requiredSize(32.dp)
                             )
 
                         }
@@ -205,7 +225,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                         Card(
                             modifier = Modifier.padding(16.dp).fillMaxSize().clickable(onClick = { navHostController.navigate("text-to-audio") }),
                             colors = CardDefaults.cardColors(
-                                containerColor = neutral_tonal_light
+                                containerColor = surface_light
                             ),
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = 8.dp
@@ -224,13 +244,17 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                                         painter = painterResource(id = R.drawable.ic_speaker),
                                         contentDescription = "Texto a Audio",
                                         modifier = Modifier.size(58.dp),
-                                        tint = MaterialTheme.colorScheme.primary
+                                        tint = primary_light
                                     )
                                 }
                                 Text(
                                     text = "Texto a Audio",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    fontFamily = FontFamily.Default,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp,
+                                    lineHeight = 24.sp,
+                                    letterSpacing = 0.1.sp,
+                                    color = primary_light,
                                     modifier = Modifier.padding(16.dp)
                                 )
                             }
@@ -238,7 +262,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                         Card(
                             modifier = Modifier.padding(16.dp).fillMaxSize().clickable(onClick = { navHostController.navigate("audio-to-text") }),
                             colors = CardDefaults.cardColors(
-                                containerColor = primary_tonal_light
+                                containerColor = surface_light
                             ),
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = 8.dp
@@ -258,13 +282,17 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                                         painter = painterResource(id = R.drawable.ic_microphone),
                                         contentDescription = "Audio a Texto",
                                         modifier = Modifier.size(58.dp),
-                                        tint = MaterialTheme.colorScheme.primary
+                                        tint = primary_light
                                     )
                                 }
                                 Text(
                                     text = "Audio a Texto",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    fontFamily = FontFamily.Default,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp,
+                                    lineHeight = 24.sp,
+                                    letterSpacing = 0.1.sp,
+                                    color = primary_light,
                                     modifier = Modifier.padding(16.dp)
                                 )
                             }
@@ -272,7 +300,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                         Card(
                             modifier = Modifier.padding(16.dp).fillMaxSize().clickable(onClick = { navHostController.navigate("find") }),
                             colors = CardDefaults.cardColors(
-                                containerColor = secondary_tonal_light
+                                containerColor = surface_light
                             ),
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = 8.dp
@@ -291,13 +319,17 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                                         painter = painterResource(id = R.drawable.ic_maps),
                                         contentDescription = "Geolocalización",
                                         modifier = Modifier.size(58.dp),
-                                        tint = MaterialTheme.colorScheme.primary
+                                        tint = primary_light
                                     )
                                 }
                                 Text(
                                     text = "Geolocalización",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    fontFamily = FontFamily.Default,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp,
+                                    lineHeight = 24.sp,
+                                    letterSpacing = 0.1.sp,
+                                    color = primary_light,
                                     modifier = Modifier.padding(16.dp)
                                 )
                             }
@@ -305,7 +337,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                         Card(
                             modifier = Modifier.padding(16.dp).fillMaxSize().clickable(onClick = { navHostController.navigate("user-profile") }),
                             colors = CardDefaults.cardColors(
-                                containerColor = tertiary_tonal_light
+                                containerColor = surface_light
                             ),
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = 8.dp
@@ -324,13 +356,17 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                                         painter = painterResource(id = R.drawable.ic_person),
                                         contentDescription = "Perfil de Usuario",
                                         modifier = Modifier.size(58.dp),
-                                        tint = MaterialTheme.colorScheme.primary
+                                        tint = primary_light
                                     )
                                 }
                                 Text(
                                     text = "Perfil de Usuario",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    fontFamily = FontFamily.Default,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp,
+                                    lineHeight = 24.sp,
+                                    letterSpacing = 0.1.sp,
+                                    color = primary_light,
                                     modifier = Modifier.padding(16.dp)
                                 )
                             }

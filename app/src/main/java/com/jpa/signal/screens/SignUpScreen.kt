@@ -17,11 +17,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,22 +50,40 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.R
 import com.jpa.signal.data.Usuario
 import com.jpa.signal.data.UsuarioRepo
 import com.jpa.signal.ui.theme.app_gradient
+import com.jpa.signal.ui.theme.background_light
+import com.jpa.signal.ui.theme.primary_light
+import com.jpa.signal.ui.theme.surface_light
+import com.jpa.signal.ui.theme.tertiary_light
 import kotlinx.coroutines.launch
 import kotlin.math.sign
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
 
+/*Pantalla de Registro de Usuario
+*
+*  @input: navHostController: Controlador de navegación de Jetpack Compose y auth: Instancia de FirebaseAuth para autenticación.
+*  @output: Pantalla de registro con campos de texto para el cada dato del usuario, botones para iniciar sesión y registrarse.
+*
+*/
+
+@Composable
+fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth) {
+
+    //Variable para controlar la corrutina
     val scope = rememberCoroutineScope()
 
+    //Variables para el registro de usuario
     val rut = rememberTextFieldState("")
     val nombre = rememberTextFieldState("")
     val apellido = rememberTextFieldState("")
@@ -74,31 +94,50 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
     val password = rememberTextFieldState("")
     val confirmPassword = rememberTextFieldState("")
 
+    //Opciones de género
     val genderOptions = listOf("Masculino", "Femenino", "Otro")
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(genderOptions[0])}
 
-    var text: String = remember { mutableStateOf("").toString() }
+    //Variable para el texto del AlertDialog
+    var text by remember { mutableStateOf("") }
 
+    //Variables para controlar la visibilidad de las contraseñas
     var showPassword by remember { mutableStateOf(false) }
     var showConfirmPassword by remember { mutableStateOf(false) }
 
-    val openAlertDialog = remember { mutableStateOf(false) }
+    //Variable que controla la visibilidad del AlertDialog
+    var openAlertDialog = remember { mutableStateOf(false) }
 
+    //Si la variable openAlertDialog es true, se muestra el AlertDialog
     when {
         openAlertDialog.value -> {
             AlertDialog(
                 onDismissRequest = { openAlertDialog.value = false },
-                title = { Text("Error", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.tertiary) },
-                text = { Text(text, color = MaterialTheme.colorScheme.primary) },
+                title = { Text("Error en el registro",
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 22.sp,
+                    lineHeight = 28.sp,
+                    letterSpacing = 0.sp,
+                    color = tertiary_light) },
+                text = { Text(
+                    text = text,
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
+                    letterSpacing = 0.5.sp,
+                    textAlign = TextAlign.Center,
+                    color = primary_light) },
                 confirmButton = {
                     TextButton(onClick = { openAlertDialog.value = false }) {
                         Text("Aceptar")
                     }
                 },
                 icon = { Icon(painter = painterResource(id = R.drawable.ic_error), contentDescription = null, modifier = Modifier.requiredSize(32.dp)) },
-                containerColor = MaterialTheme.colorScheme.surface,
-                textContentColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.tertiary
+                containerColor = surface_light,
+                textContentColor = primary_light,
+                titleContentColor = tertiary_light,
             )
         }
     }
@@ -110,24 +149,21 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
             TopAppBar(
                 title = { Text(
                     text = "Registro de Usuario",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.background) },
-                modifier = Modifier.background(
-                    Brush.verticalGradient(
-                        colors = app_gradient,
-                        startY = 0f,
-                        endY = Float.POSITIVE_INFINITY
-                    )
-                ),
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 22.sp,
+                    lineHeight = 28.sp,
+                    letterSpacing = 0.sp,
+                    color = background_light) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
+                    containerColor = primary_light
                 ),
                 navigationIcon = {
                     IconButton(onClick = { navHostController.popBackStack() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_back),
                             contentDescription = "Volver",
-                            tint = MaterialTheme.colorScheme.background,
+                            tint = background_light,
                             modifier = Modifier.requiredSize(24.dp)
                         )
                     }
@@ -162,25 +198,25 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.large
+                                color = primary_light,
+                                shape = RoundedCornerShape(25.dp)
                             ),
-                        shape = MaterialTheme.shapes.large,
+                        shape = RoundedCornerShape(25.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = tertiary_light,
+                            unfocusedTextColor = primary_light,
                             focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                            unfocusedPlaceholderColor = primary_light
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_person),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primary_light,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -191,7 +227,7 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_clear),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primary_light,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -212,25 +248,25 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.large
+                                color = primary_light,
+                                shape = RoundedCornerShape(25.dp)
                             ),
-                        shape = MaterialTheme.shapes.large,
+                        shape = RoundedCornerShape(25.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = tertiary_light,
+                            unfocusedTextColor = primary_light,
                             focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                            unfocusedPlaceholderColor = primary_light
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_person),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primary_light,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -241,7 +277,7 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_clear),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primary_light,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -262,25 +298,25 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.large
+                                color = primary_light,
+                                shape = RoundedCornerShape(25.dp)
                             ),
-                        shape = MaterialTheme.shapes.large,
+                        shape = RoundedCornerShape(25.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = tertiary_light,
+                            unfocusedTextColor = primary_light,
                             focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                            unfocusedPlaceholderColor = primary_light
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_person),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primary_light,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -291,7 +327,7 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_clear),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primary_light,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -312,25 +348,25 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.large
+                                color = primary_light,
+                                shape = RoundedCornerShape(25.dp)
                             ),
-                        shape = MaterialTheme.shapes.large,
+                        shape = RoundedCornerShape(25.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = tertiary_light,
+                            unfocusedTextColor = primary_light,
                             focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                            unfocusedPlaceholderColor = primary_light
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_person),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primary_light,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -341,7 +377,7 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_clear),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primary_light,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -362,25 +398,25 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.large
+                                color = primary_light,
+                                shape = RoundedCornerShape(25.dp)
                             ),
-                        shape = MaterialTheme.shapes.large,
+                        shape = RoundedCornerShape(25.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = tertiary_light,
+                            unfocusedTextColor = primary_light,
                             focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                            unfocusedPlaceholderColor = primary_light
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_phone),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primary_light,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -391,7 +427,7 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_clear),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primary_light,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -412,25 +448,25 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.large
+                                color = primary_light,
+                                shape = RoundedCornerShape(25.dp)
                             ),
-                        shape = MaterialTheme.shapes.large,
+                        shape = RoundedCornerShape(25.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = tertiary_light,
+                            unfocusedTextColor = primary_light,
                             focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                            unfocusedPlaceholderColor = primary_light
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_address),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primary_light,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -441,7 +477,7 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_clear),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primary_light,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -457,6 +493,13 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.Center
                     ) {
+                        Text(
+                            text = "Género",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = primary_light,
+                            modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
+                        )
                         genderOptions.forEach { text ->
                             Row(
                                 modifier = Modifier.fillMaxWidth()
@@ -474,13 +517,18 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                     selected = (text == selectedOption),
                                     onClick = null,
                                     colors = androidx.compose.material3.RadioButtonDefaults.colors(
-                                        selectedColor = MaterialTheme.colorScheme.primary,
-                                        unselectedColor = MaterialTheme.colorScheme.primary
+                                        selectedColor = primary_light,
+                                        unselectedColor = primary_light
                                     )
                                 )
                                 Text(
                                     text = text,
-                                    style = MaterialTheme.typography.bodyMedium.merge(),
+                                    fontFamily = FontFamily.Default,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 14.sp,
+                                    lineHeight = 20.sp,
+                                    letterSpacing = 0.25.sp,
+                                    color = primary_light,
                                     modifier = Modifier.padding(start = 16.dp)
                                 )
                             }
@@ -501,25 +549,25 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.large
+                                color = primary_light,
+                                shape = RoundedCornerShape(25.dp)
                             ),
-                        shape = MaterialTheme.shapes.large,
+                        shape = RoundedCornerShape(25.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = tertiary_light,
+                            unfocusedTextColor = primary_light,
                             focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                            unfocusedPlaceholderColor = primary_light
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_email),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primary_light,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -530,7 +578,7 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_clear),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primary_light,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -541,7 +589,6 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
 
-
                     SecureTextField(
                         state = password,
                         placeholder = { Text("Contraseña") },
@@ -551,25 +598,25 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.large
+                                color = primary_light,
+                                shape = RoundedCornerShape(25.dp)
                             ),
-                        shape = MaterialTheme.shapes.large,
+                        shape = RoundedCornerShape(25.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = tertiary_light,
+                            unfocusedTextColor = primary_light,
                             focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                            unfocusedPlaceholderColor = primary_light
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_pass),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primary_light,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -601,25 +648,25 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.large
+                                color = primary_light,
+                                shape = RoundedCornerShape(25.dp)
                             ),
-                        shape = MaterialTheme.shapes.large,
+                        shape = RoundedCornerShape(25.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.tertiary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = tertiary_light,
+                            unfocusedTextColor = primary_light,
                             focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary
+                            unfocusedPlaceholderColor = primary_light
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_pass),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primary_light,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -630,7 +677,7 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 Icon(
                                     painter = painterResource(id = if (showConfirmPassword) R.drawable.ic_visibility else R.drawable.ic_visibility_off),
                                     contentDescription = "Mostrar - ocultar contraseña",
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primary_light,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -638,54 +685,41 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                         textObfuscationMode = if (showConfirmPassword) TextObfuscationMode.Visible else TextObfuscationMode.RevealLastTyped,
                     )
                 }
+                item{
+                    Spacer(modifier = Modifier.height(24.dp))
+
+
+                }
+
                 item {
                     Spacer(modifier = Modifier.height(40.dp))
 
                     Button(
                         onClick = {
-                            if (email.text.isEmpty() || password.text.isEmpty() || confirmPassword.text.isEmpty() ){
-                                AlertDialog.Builder(
-                                    navHostController.context)
-                                    .setTitle("Error")
-                                    .setMessage("Todos los campos son obligatorios")
-                                    .setPositiveButton("Aceptar")
-                                    {
-                                            dialog, _ -> dialog.dismiss()
-                                    }.show()
+                            if (email.text.isEmpty() || password.text.isEmpty() || confirmPassword.text.isEmpty() || rut.text.isEmpty() || nombre.text.isEmpty() || apellido.text.isEmpty() || edad.text.isEmpty() || telefono.text.isEmpty() || direccion.text.isEmpty() ){
+                                openAlertDialog.value = true
+                                text = "Por favor, complete todos los campos"
                             }
                             else if (!email.text.contains("@")){
-                                AlertDialog.Builder(
-                                    navHostController.context)
-                                    .setTitle("Error")
-                                    .setMessage("El correo electrónico no es válido")
-                                    .setPositiveButton("Aceptar")
-                                    {
-                                            dialog, _ -> dialog.dismiss()
-                                    }.show()
+                                openAlertDialog.value = true
+                                text = "El correo electrónico no es válido"
                             }
                             else if(password.text != confirmPassword.text){
-                                AlertDialog.Builder(
-                                    navHostController.context)
-                                    .setTitle("Error")
-                                    .setMessage("Las contraseñas no coinciden")
-                                    .setPositiveButton("Aceptar")
-                                    {
-                                            dialog, _ -> dialog.dismiss()
-                                    }.show()
+                                openAlertDialog.value = true
+                                text = "Las contraseñas no coinciden"
                             }
                             else if (password.text.length !in 8..22 || password.text.contains(Regex("[^A-Za-z0-9]"))){
-                                AlertDialog.Builder(
-                                    navHostController.context)
-                                    .setTitle("Error")
-                                    .setMessage("La contraseña debe tener entre 8 y 22 caracteres, al menos un número una letra mayúscula y  una minúscula ")
-                                    .setPositiveButton("Aceptar")
-                                    {
-                                        dialog, _ -> dialog.dismiss()
-                                    }.show()
+                                openAlertDialog.value = true
+                                text = "La contraseña debe tener entre 8 y 22 caracteres, al menos un número y una letra"
                             }
                             else{
+                                //Creación de usuario con email y contraseña
                                 auth.createUserWithEmailAndPassword(email.text.toString(), password.text.toString()).addOnCompleteListener { task ->
                                     if (task.isSuccessful){
+                                        /*
+                                        Si el usuario se creó correctamente, se crea un usuario en la base de datos y se incia sesión automáticamente
+                                        esto permite capturar el uid del usuario para guardar el resto de datos en la base de datos
+                                        */
                                         auth.signInWithEmailAndPassword(email.text.toString(), password.text.toString()).addOnCompleteListener { signInTask ->
                                             if (signInTask.isSuccessful) {
                                                 scope.launch {
@@ -699,21 +733,19 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                                             genero = selectedOption,
                                                             telefono = telefono.text as String,
                                                             correo = email.text as String,
-                                                            direccion = direccion.text as String
+                                                            direccion = direccion.text as String,
                                                         )
                                                     )
                                                 }
-                                                navHostController.navigate("user-profile")
-
-                                            } else {
-                                                text = signInTask.exception.toString()
                                                 openAlertDialog.value = true
+                                                text = "Usuario creado exitosamente"
+                                                navHostController.navigate("home")
+                                            }
+                                            else{
+                                                openAlertDialog.value = true
+                                                text = "Error al crear usuario"
                                             }
                                         }
-                                    }
-                                    else {
-                                        text = task.exception.toString()
-                                        openAlertDialog.value = true
                                     }
                                 }
                             }
@@ -723,7 +755,10 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }
-                                .height(56.dp)
+                                .height(56.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = primary_light,
+                        )
                     ) {
                         Text("Enviar")
                     }
@@ -735,8 +770,9 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     ) {
                         Text(
                             text = "Ya tengo una cuenta",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.tertiary
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = tertiary_light
                         )
                     }
                 }

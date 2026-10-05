@@ -49,7 +49,6 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.realtime)
 
-    implementation(libs.kotlinx.flow)
 
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)

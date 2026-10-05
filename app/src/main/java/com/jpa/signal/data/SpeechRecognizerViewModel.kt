@@ -9,9 +9,7 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import androidx.annotation.RequiresApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import java.util.Locale
 
 class SpeechRecognizerViewModel: ViewModel() {
@@ -30,6 +28,51 @@ class SpeechRecognizerViewModel: ViewModel() {
             _textState.value = "El dispositivo no soporta reconocimiento en voz a texto"
             return
         }
-    }
+
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply{
+            setRecognitionListener(object : RecognitionListener {
+                override fun onReadyForSpeech(params: Bundle?) {
+                    _isListening.value = true
+                    _textState.value = "Escuchando..."
+
+                }
+                override fun onBeginningOfSpeech() {}
+                override fun onRmsChanged(rmsdB: Float) {}
+                override fun onBufferReceived(buffer: ByteArray?) {}
+                override fun onEndOfSpeech() {
+                    _isListening.value = false
+                }
+                override fun onError(error: Int) {
+                    _isListening.value = false
+                    _textState.value = "Error al reconocer la voz código: $error"
+                }
+
+                override fun onResults(results: Bundle?) {
+                    val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                    if (!matches.isNullOrEmpty()) {
+                        _textState.value = matches[0]
+                    }
+                }
+
+                override fun onPartialResults(partialResults: Bundle?) {}
+                override fun onEvent(eventType: Int, params: Bundle?) {}
+            })
+        }
+
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+        }
+        speechRecognizer?.startListening(intent)
+
+        }
+        fun stopListening() {
+            speechRecognizer?.stopListening()
+            _isListening.value = false
+        }
+
+        override fun onCleared() {
+            speechRecognizer?.destroy()
+        }
 
 }
