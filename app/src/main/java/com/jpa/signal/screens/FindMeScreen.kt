@@ -137,13 +137,13 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
             route = "home"
         ),
         NavItem(
-            title = "Voz a\nTexto",
+            title = "Voz a Texto",
             function = { navHostController.navigate("audio-to-text") },
             icon = R.drawable.ic_microphone,
             route = "audio-to-text"
         ),
         NavItem(
-            title = "Texto a\nVoz",
+            title = "Texto a Voz",
             function = { navHostController.navigate("text-to-audio") },
             icon = R.drawable.ic_speaker,
             route = "text-to-audio"
@@ -200,10 +200,7 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     },
                     selected = navHostController.currentDestination?.route == item.route,
                     colors = NavigationItemColors(
-                        selectedTextColor = when {
-                            currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> background_light
-                            else -> tertiary_light
-                        },
+                        selectedTextColor = background_light,
                         selectedIconColor = tertiary_light,
                         unselectedTextColor = background_light,
                         unselectedIconColor = background_light,
