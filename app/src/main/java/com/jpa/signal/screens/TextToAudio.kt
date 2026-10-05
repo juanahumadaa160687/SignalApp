@@ -2,15 +2,20 @@ package com.jpa.signal.screens
 
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,10 +36,14 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,10 +57,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.R
+import com.jpa.signal.data.FrasesRepo
 import com.jpa.signal.data.NavItem
+import com.jpa.signal.data.Phrase
 import com.jpa.signal.ui.theme.background_light
 import com.jpa.signal.ui.theme.primary_light
 import com.jpa.signal.ui.theme.tertiary_light
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,11 +77,28 @@ import java.util.Locale
 @Composable
 fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
 
+    val scope = rememberCoroutineScope()
+
+    val currentUser = auth.currentUser
+
     //Variables para el transcrito de texto a audio
     val context = LocalContext.current
     var textToSpeak by remember { mutableStateOf("") }
     var textToSpeech by remember { mutableStateOf<TextToSpeech?>(null) }
     var isInitialized by remember { mutableStateOf(false) }
+
+    var phraseState by remember { mutableStateOf("") }
+
+    var userPhrases = remember { mutableStateListOf<String>() }
+
+    LaunchedEffect(Unit) {
+        var phrases = FrasesRepo.getFrasesByUid(currentUser!!.uid)
+        if (phrases != null) {
+            userPhrases.clear()
+            userPhrases.addAll(phrases.phrase)
+        }
+    }
+
 
     //Inicialización de la API de TextToSpeech
     DisposableEffect(Unit) {
@@ -111,15 +140,15 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
         ),
         NavItem(
             title = "Voz a\nTexto",
-            function = { navHostController.navigate("voice-to-text") },
+            function = { navHostController.navigate("audio-to-text") },
             icon = R.drawable.ic_microphone,
-            route = "voice-to-text"
+            route = "audio-to-text"
         ),
         NavItem(
             title = "Texto a\nVoz",
-            function = { navHostController.navigate("text-to-voice") },
+            function = { navHostController.navigate("text-to-audio") },
             icon = R.drawable.ic_speaker,
-            route = "text-to-voice"
+            route = "text-to-audio"
         ),
         NavItem(
             title = "Salir",
@@ -244,80 +273,208 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-
-                ) {TextField(
-                    value = textToSpeak,
-                    onValueChange = { textToSpeak = it },
-                    placeholder = { Text("Ingrese el texto a convertir en audio") },
-                    modifier =
-                        when{
-                            currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
-                            else -> Modifier.fillMaxWidth(0.5f)
-                        }.border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = MaterialTheme.shapes.large
-                        ),
-                    shape = MaterialTheme.shapes.large,
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedTextColor = tertiary_light,
-                        unfocusedTextColor = primary_light,
-                        focusedPlaceholderColor = Color.Gray,
-                        unfocusedPlaceholderColor = primary_light
-                    ),
-                    trailingIcon = {
-                        IconButton(
-                            onClick = { textToSpeak = "" },
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_clear),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    },
-                )}
-
-                Spacer(modifier = Modifier.padding(20.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize().padding(vertical = 8.dp, horizontal = 16.dp),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    IconButton(
-                        onClick = {
-                            // Convertir el texto a audio
-                            if (isInitialized) {
-                                textToSpeech?.speak(
-                                    textToSpeak,
-                                    TextToSpeech.QUEUE_FLUSH,
-                                    null,
-                                    null
+                    item{
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+
+                        ) {TextField(
+                            value = textToSpeak,
+                            onValueChange = { textToSpeak = it },
+                            placeholder = { Text("Ingrese el texto a convertir en audio") },
+                            modifier =
+                                when{
+                                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
+                                    else -> Modifier.fillMaxWidth(0.5f)
+                                }.border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = MaterialTheme.shapes.large
+                                ),
+                            shape = MaterialTheme.shapes.large,
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                focusedTextColor = tertiary_light,
+                                unfocusedTextColor = primary_light,
+                                focusedPlaceholderColor = Color.Gray,
+                                unfocusedPlaceholderColor = primary_light
+                            ),
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = { textToSpeak = "" },
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_clear),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
+                            },
+                        )}
+                    }
+
+                    item{
+                        Spacer(modifier = Modifier.padding(20.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    // Convertir el texto a audio
+                                    if (isInitialized) {
+                                        textToSpeech?.speak(
+                                            textToSpeak,
+                                            TextToSpeech.QUEUE_FLUSH,
+                                            null,
+                                            null
+                                        )
+                                    }
+                                },
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    containerColor = primary_light
+                                ),
+                                modifier = Modifier.size(85.dp)
+
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_speaker),
+                                    contentDescription = "Convertir Texto a Audio",
+                                    modifier = Modifier.size(58.dp),
+                                    tint = background_light
                                 )
                             }
-                        },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = primary_light
-                        ),
-                        modifier = Modifier.size(85.dp)
+                        }
+                    }
 
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_speaker),
-                            contentDescription = "Convertir Texto a Audio",
-                            modifier = Modifier.size(58.dp),
-                            tint = background_light
-                        )
+                    item{
+                        Spacer(modifier = Modifier.padding(20.dp))
+
+                        userPhrases.forEach { phrase ->
+
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+
+                            ) {
+                                Text(
+                                    text = phrase,
+                                    fontFamily = FontFamily.Default,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 28.sp,
+                                    lineHeight = 36.sp,
+                                    letterSpacing = 0.sp,
+                                    color = primary_light,
+                                    modifier = Modifier.clickable(
+                                        onClick = {
+                                            textToSpeak = phrase
+                                        }
+                                    )
+                                )
+                                Spacer(modifier = Modifier.padding(12.dp))
+                            }
+                        }
+                    }
+
+                    item{
+                        Spacer(modifier = Modifier.padding(20.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            //Agregar nueva frase preefinida
+                            TextField(
+                                value = phraseState,
+                                onValueChange = { phraseState = it },
+                                placeholder = { Text("Ingrese una nueva frase") },
+                                maxLines = 1,
+                                modifier = when {
+                                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
+                                    else -> Modifier.fillMaxWidth(0.5f)
+                                }.border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = MaterialTheme.shapes.large
+                                ),
+                                shape = MaterialTheme.shapes.large,
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    focusedTextColor = tertiary_light,
+                                    unfocusedTextColor = primary_light,
+                                    focusedPlaceholderColor = Color.Gray,
+                                    unfocusedPlaceholderColor = primary_light
+                                ),
+                            )
+                        }
+                    }
+                    item{
+                        Spacer(modifier = Modifier.padding(20.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+
+                        ) {
+                            Button(
+                                onClick = {
+                                    val userUid = currentUser?.uid
+
+                                    userPhrases.add(phraseState)
+
+                                    if (phraseState.isNotEmpty()) {
+                                        scope.launch {
+                                            FrasesRepo.addFrase(userUid!!, Phrase(phrase = userPhrases))
+                                            phraseState = ""
+                                        }
+                                    }
+                                },
+                                modifier = when {
+                                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth().height(56.dp)
+                                    else -> Modifier.fillMaxWidth(0.5f).height(56.dp)
+                                }
+                            ){
+                                Text(text = "Agregar")
+                            }
+                        }
+                    }
+                    item{
+                        Spacer(modifier = Modifier.padding(16.dp))
+
+                        Button(
+                            onClick = {
+                                val userUid = currentUser?.uid
+
+                                scope.launch {
+                                    FrasesRepo.deleteFrase(userUid!!)
+                                    navHostController.navigate("text-to-audio")
+                                }
+                            },
+                            modifier = when {
+                                currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth().height(56.dp)
+                                else -> Modifier.fillMaxWidth(0.5f).height(56.dp)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Red
+                            )
+                        ){
+                            Text(text = "Limpiar")
+                        }
                     }
                 }
             }

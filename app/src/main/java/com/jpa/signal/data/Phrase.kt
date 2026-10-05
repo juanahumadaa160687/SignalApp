@@ -4,7 +4,6 @@ import com.google.firebase.database.*
 import kotlinx.coroutines.tasks.await
 
 data class Phrase(
-    val userUid: String = "",
     val phrase: List<String> = emptyList()
 )
 
@@ -22,12 +21,8 @@ class FrasesRepo {
             database.child(uid).removeValue().await()
         }
 
-        suspend fun updateFrase(phrase: Phrase) {
-            database.child(phrase.userUid).setValue(phrase).await()
-        }
-
-        suspend fun addFrase(phrase: Phrase) {
-            database.child(phrase.userUid).setValue(phrase).await()
+        suspend fun addFrase(userUid: String, phrase: Phrase) {
+            database.child(userUid).setValue(phrase).await()
 
         }
     }

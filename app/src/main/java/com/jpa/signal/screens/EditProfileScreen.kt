@@ -108,15 +108,15 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
         ),
         NavItem(
             title = "Voz a\nTexto",
-            function = { navHostController.navigate("voice-to-text") },
+            function = { navHostController.navigate("audio-to-text") },
             icon = R.drawable.ic_microphone,
-            route = "voice-to-text"
+            route = "audio-to-text"
         ),
         NavItem(
             title = "Texto a\nVoz",
-            function = { navHostController.navigate("text-to-voice") },
+            function = { navHostController.navigate("text-to-audio") },
             icon = R.drawable.ic_speaker,
-            route = "text-to-voice"
+            route = "text-to-audio"
         ),
         NavItem(
             title = "Salir",
