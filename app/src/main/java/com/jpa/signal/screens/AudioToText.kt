@@ -52,13 +52,22 @@ import com.jpa.signal.ui.theme.tertiary_light
 val viewModel = SpeechRecognizerViewModel()
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.S)
+
+/*Pantalla de Voz a Texto
+*
+*  @input: navHostController: Controlador de navegación de Jetpack Compose y auth: Instancia de FirebaseAuth para autenticación.
+*  @output: Pantalla de voz a texto con botones de escuchar y detener.
+*
+*/
 @Composable
 fun AudioToText(navHostController: NavHostController, auth: FirebaseAuth) {
 
+    //Variables para el viewModel
     val context = LocalContext.current
     val isListening by viewModel.isListening.collectAsState()
     val textState by viewModel.textState.collectAsState()
 
+    //Permiso de grabación de audio
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ){isGranted ->
@@ -234,9 +243,11 @@ fun AudioToText(navHostController: NavHostController, auth: FirebaseAuth) {
                     ) {
                         Button(
                             onClick = {
+                                // Si el usuario ya está escuchando, detener la grabación
                                 if (isListening) {
                                     viewModel.stopListening()
                                 } else {
+                                    // Si no está escuchando, solicitar el permiso de grabación de audio
                                     permissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
                                 }
                             },

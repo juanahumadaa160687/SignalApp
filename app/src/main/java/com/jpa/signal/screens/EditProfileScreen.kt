@@ -67,7 +67,14 @@ import com.jpa.signal.ui.theme.tertiary_light
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
+/*Pantalla de edición de perfil de usuario
+*
+*  @input: navHostController: Controlador de navegación de Jetpack Compose y auth: Instancia de FirebaseAuth para autenticación.
+*  @output: Pantalla de edición de perfil de usuario con campos de texto para el nombre, apellido, edad, teléfono y dirección.
+*
+*/
 @Composable
+
 fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) {
 
     val currentUser = auth.currentUser

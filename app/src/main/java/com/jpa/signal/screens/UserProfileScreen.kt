@@ -61,6 +61,12 @@ import com.jpa.signal.ui.theme.tertiary_light
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
+/*Pantalla de Perfil de Usuario
+*
+*  @input: navHostController: Controlador de navegación de Jetpack Compose y auth: Instancia de FirebaseAuth para autenticación.
+*  @output: Pantalla de perfil con información del usuario y opciones de navegación.
+*
+*/
 @Composable
 fun UserProfileScreen(navHostController: NavHostController, auth: FirebaseAuth){
 

@@ -21,6 +21,13 @@ import com.jpa.signal.screens.TextToAudio
 import com.jpa.signal.screens.UserProfileScreen
 
 @RequiresApi(Build.VERSION_CODES.S)
+
+/*Navegación de la aplicación
+*
+*  @input: navHostController: Controlador de navegación de Jetpack Compose y auth: Instancia de FirebaseAuth para autenticación.
+*  @output: Navegación de la aplicación con diferentes pantallas.
+*
+*/
 @Composable
 fun NavigationWrapper(navHostController: NavHostController, auth: FirebaseAuth) {
 

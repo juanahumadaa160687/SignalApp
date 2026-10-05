@@ -12,16 +12,20 @@ import androidx.annotation.RequiresApi
 import kotlinx.coroutines.flow.*
 import java.util.Locale
 
+//ViewModel para el reconocimiento de voz
 class SpeechRecognizerViewModel: ViewModel() {
 
+    //Variable para el reconocimiento de voz
     private var speechRecognizer: SpeechRecognizer? = null
 
+    //Variables para el estado del reconocimiento de voz
     private val _textState = MutableStateFlow("")
     val textState: StateFlow<String> = _textState.asStateFlow()
 
     private val _isListening = MutableStateFlow(false)
     val isListening: StateFlow<Boolean> = _isListening.asStateFlow()
 
+    //Función para iniciar el reconocimiento de voz
     @RequiresApi(Build.VERSION_CODES.S)
     fun startListening(context: Context) {
         if (!SpeechRecognizer.isOnDeviceRecognitionAvailable(context)){
@@ -59,6 +63,7 @@ class SpeechRecognizerViewModel: ViewModel() {
             })
         }
 
+        //Configuración del reconocimiento de voz
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
@@ -66,11 +71,12 @@ class SpeechRecognizerViewModel: ViewModel() {
         speechRecognizer?.startListening(intent)
 
         }
+        //Función para detener el reconocimiento de voz
         fun stopListening() {
             speechRecognizer?.stopListening()
             _isListening.value = false
         }
-
+        //Función para destruir el reconocimiento de voz
         override fun onCleared() {
             speechRecognizer?.destroy()
         }

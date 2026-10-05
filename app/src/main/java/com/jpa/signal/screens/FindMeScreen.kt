@@ -62,20 +62,32 @@ import com.jpa.signal.ui.theme.tertiary_light
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
+/*Pantalla FindMe
+*
+*  @input: navHostController: Controlador de navegación de Jetpack Compose y auth: Instancia de FirebaseAuth para autenticación.
+*  @output: Pantalla home con botones para navegar a las pantallas de texto a audio, audio a texto, geolocalización y perfil de usuario.
+*
+*/
 @Composable
 fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
+
+    //Variables para el mapa
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val fusedLocationClient = remember{ LocationServices.getFusedLocationProviderClient(context) }
 
+    //Variables para el marcador
     var userLatLng by remember {mutableStateOf<LatLng?>(null)}
 
+    //Variable para la cámara
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(-20.21492183013291, -70.13583108234238), 20f)
     }
 
+    //Variable para el marcador
     var markerState by remember { mutableStateOf<MarkerState?>(null) }
 
+    //Permisos de ubicación
     var hasLocationPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
@@ -85,6 +97,7 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
         )
     }
 
+    //Función para actualizar la cámara
     fun updateMapCamera(latLng: LatLng){
         userLatLng = latLng
         markerState = MarkerState(position = latLng)
@@ -94,7 +107,8 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
           )
         }
     }
-    
+
+    //Función para solicitar los permisos de ubicación
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
@@ -257,6 +271,7 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
+                    //Servicio de ubicación
                     GoogleMap(
                         modifier = Modifier.fillMaxSize(),
                         cameraPositionState = cameraPositionState,
@@ -270,6 +285,7 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
                             compassEnabled = true
                         )
                     ) {
+                        //Opción de marcador
                         markerState?.let { state ->
                             Marker(
                                 state = state,
