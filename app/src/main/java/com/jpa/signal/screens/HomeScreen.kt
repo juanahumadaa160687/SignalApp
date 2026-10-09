@@ -30,6 +30,11 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -44,6 +49,8 @@ import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.R
 import com.jpa.signal.data.NavItem
+import com.jpa.signal.data.Usuario
+import com.jpa.signal.data.UsuarioRepo
 import com.jpa.signal.ui.theme.app_gradient
 import com.jpa.signal.ui.theme.background_light
 import com.jpa.signal.ui.theme.neutral_tonal_light
@@ -67,6 +74,14 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
 
     //Variable para el Scaffold que contiene la Navigation Suite para mostrar una barra de navegación de acuerdo con el tamaño de la pantalla
     val state = rememberNavigationSuiteScaffoldState()
+
+    val currentUserID = auth.currentUser?.uid
+
+    var usuario: Usuario? by remember { mutableStateOf(Usuario()) }
+
+    LaunchedEffect(Unit) {
+        usuario = UsuarioRepo.getUsuarioByUid(currentUserID!!)
+    }
 
     //Lista de items para la Navigation Suite
     val navItems = listOf(
@@ -164,7 +179,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
             topBar = {
                 TopAppBar(
                     title = { Text(
-                        text = "Bienvenido a Signl App",
+                        text = "Bienvenido ${usuario?.nombre}",
                         fontFamily = FontFamily.Default,
                         fontWeight = FontWeight.Normal,
                         fontSize = 22.sp,

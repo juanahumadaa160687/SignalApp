@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,11 +51,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.R
+import com.jpa.signal.data.Usuario
+import com.jpa.signal.data.UsuarioRepo
 import com.jpa.signal.ui.theme.app_gradient
 import com.jpa.signal.ui.theme.background_light
 import com.jpa.signal.ui.theme.primary_light
 import com.jpa.signal.ui.theme.surface_light
 import com.jpa.signal.ui.theme.tertiary_light
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 
@@ -81,6 +85,10 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
 
     var text by remember { mutableStateOf("") }
 
+    val scope = rememberCoroutineScope()
+
+    var usuario: Usuario by remember { mutableStateOf(Usuario()) }
+
     //Variable que controla la visibilidad del AlertDialog
     val openAlertDialog = remember { mutableStateOf(false) }
 
@@ -89,13 +97,29 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
         openAlertDialog.value -> {
             AlertDialog(
                 onDismissRequest = { openAlertDialog.value = false },
-                title = { Text("Error",
-                    fontFamily = FontFamily.Default,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 22.sp,
-                    lineHeight = 28.sp,
-                    letterSpacing = 0.sp,
-                    color = tertiary_light) },
+                title = {
+                    when {
+                        text == "El correo electrónico o la contraseña son incorrectos." || text == "Por favor, ingrese un correo electrónico y una contraseña." ->
+                            Text(
+                                text = "Oops... algo anda mal",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 22.sp,
+                                lineHeight = 28.sp,
+                                letterSpacing = 0.sp,
+                                color = primary_light
+                            )
+                        else -> Text(
+                            text = "Inicio de Sesión Exitoso",
+                            fontFamily = FontFamily.Default,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 22.sp,
+                            lineHeight = 28.sp,
+                            letterSpacing = 0.sp,
+                            color = primary_light
+                        )
+                    }
+                },
                 text = { Text(
                     text = text,
                     fontFamily = FontFamily.Default,
@@ -106,8 +130,15 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     textAlign = TextAlign.Center,
                     color = primary_light) },
                 confirmButton = {
-                    TextButton(onClick = { openAlertDialog.value = false }) {
-                        Text("Aceptar")
+                    TextButton(onClick = {
+                        when {
+                            text == "El correo electrónico o la contraseña son incorrectos." || text == "Por favor, ingrese un correo electrónico y una contraseña." -> openAlertDialog.value = false
+                        }
+                    }) {
+                        when {
+                            text == "El correo electrónico o la contraseña son incorrectos." || text == "Por favor, ingrese un correo electrónico y una contraseña." -> Text("Reintentar")
+                            else -> Text("Ingresar")
+                        }
                     }
                 },
                 icon = { Icon(painter = painterResource(id = R.drawable.ic_error), contentDescription = null, modifier = Modifier.requiredSize(32.dp)) },
@@ -299,7 +330,14 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 )
                                     .addOnCompleteListener { task ->
                                         if (task.isSuccessful) {
-                                            navHostController.navigate("home")
+
+                                            scope.launch {
+                                                usuario = UsuarioRepo.getUsuarioByUid(auth.currentUser!!.uid)!!
+                                            }
+
+                                            text = "Bienvenido ${usuario.nombre}"
+                                            openAlertDialog.value = true
+
                                         } else {
                                             text = "El correo electrónico o la contraseña son incorrectos."
                                             openAlertDialog.value = true
