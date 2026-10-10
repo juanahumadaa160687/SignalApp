@@ -30,3 +30,5 @@ val tertiary_tonal_dark = Color(0xFF4f5f80)
 
 val app_gradient = listOf(tertiary_tonal_dark, secondary_tonal_dark, primary_tonal_dark, neutral_tonal_dark)
 
+val app_success = Color(0xFF00c853)
+val app_error = Color(0xFFff5252)

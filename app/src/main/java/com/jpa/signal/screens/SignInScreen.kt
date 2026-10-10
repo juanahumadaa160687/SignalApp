@@ -53,7 +53,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.R
 import com.jpa.signal.data.Usuario
 import com.jpa.signal.data.UsuarioRepo
+import com.jpa.signal.ui.theme.app_error
 import com.jpa.signal.ui.theme.app_gradient
+import com.jpa.signal.ui.theme.app_success
 import com.jpa.signal.ui.theme.background_light
 import com.jpa.signal.ui.theme.primary_light
 import com.jpa.signal.ui.theme.surface_light
@@ -133,6 +135,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     TextButton(onClick = {
                         when {
                             text == "El correo electrónico o la contraseña son incorrectos." || text == "Por favor, ingrese un correo electrónico y una contraseña." -> openAlertDialog.value = false
+                            else -> navHostController.navigate("home") { popUpTo("initial") }
                         }
                     }) {
                         when {
@@ -141,7 +144,12 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                         }
                     }
                 },
-                icon = { Icon(painter = painterResource(id = R.drawable.ic_error), contentDescription = null, modifier = Modifier.requiredSize(32.dp)) },
+                icon = {
+                    when {
+                        text == "El correo electrónico o la contraseña son incorrectos." || text == "Por favor, ingrese un correo electrónico y una contraseña." -> Icon(painter = painterResource(id = R.drawable.ic_error), contentDescription = null, tint = app_error, modifier = Modifier.requiredSize(32.dp))
+                        else -> Icon(painter = painterResource(id = R.drawable.ic_success), contentDescription = null, tint = app_success, modifier = Modifier.requiredSize(32.dp))
+                    }
+                },
                 containerColor = surface_light,
                 textContentColor = primary_light,
                 titleContentColor = tertiary_light,
@@ -168,7 +176,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                 ),
 
                 navigationIcon = {
-                    IconButton(onClick = { navHostController.popBackStack() }) {
+                    IconButton(onClick = { navHostController.navigate("initial") }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_back),
                             contentDescription = "Volver",
@@ -333,10 +341,9 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
 
                                             scope.launch {
                                                 usuario = UsuarioRepo.getUsuarioByUid(auth.currentUser!!.uid)!!
+                                                text = "Bienvenido ${usuario.nombre} ${usuario.apellido}"
+                                                openAlertDialog.value = true
                                             }
-
-                                            text = "Bienvenido ${usuario.nombre}"
-                                            openAlertDialog.value = true
 
                                         } else {
                                             text = "El correo electrónico o la contraseña son incorrectos."

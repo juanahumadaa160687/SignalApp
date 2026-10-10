@@ -16,8 +16,6 @@ import com.jpa.signal.screens.InitialScreen
 import com.jpa.signal.screens.SignInScreen
 import com.jpa.signal.screens.SignUpScreen
 import com.jpa.signal.screens.HomeScreen
-import com.jpa.signal.screens.ResetPasswordScreen
-import com.jpa.signal.screens.SignUpGoogle
 import com.jpa.signal.screens.TextToAudio
 import com.jpa.signal.screens.UserProfileScreen
 
@@ -42,17 +40,11 @@ fun NavigationWrapper(navHostController: NavHostController, auth: FirebaseAuth) 
         composable("sign-up") {
             SignUpScreen(navHostController, auth)
         }
-        composable("sign-up-google") {
-            SignUpGoogle(navHostController, auth)
-        }
         composable("home") {
             HomeScreen(navHostController, auth)
         }
         composable("forgot-password") {
             ForgotPasswordScreen(navHostController, auth)
-        }
-        composable("reset-password") {
-            ResetPasswordScreen(navHostController, auth)
         }
         composable("user-profile") {
             UserProfileScreen(navHostController, auth)

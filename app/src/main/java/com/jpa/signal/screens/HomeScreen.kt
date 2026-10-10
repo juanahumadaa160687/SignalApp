@@ -75,14 +75,6 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
     //Variable para el Scaffold que contiene la Navigation Suite para mostrar una barra de navegación de acuerdo con el tamaño de la pantalla
     val state = rememberNavigationSuiteScaffoldState()
 
-    val currentUserID = auth.currentUser?.uid
-
-    var usuario: Usuario? by remember { mutableStateOf(Usuario()) }
-
-    LaunchedEffect(Unit) {
-        usuario = UsuarioRepo.getUsuarioByUid(currentUserID!!)
-    }
-
     //Lista de items para la Navigation Suite
     val navItems = listOf(
         NavItem(
@@ -156,8 +148,11 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                     },
                     selected = navHostController.currentDestination?.route == item.route,
                     colors = NavigationItemColors(
-                        selectedTextColor = background_light,
-                        selectedIconColor = tertiary_light,
+                        selectedTextColor = when{
+                            currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> background_light
+                            else -> primary_light
+                        },
+                        selectedIconColor = primary_light,
                         unselectedTextColor = background_light,
                         unselectedIconColor = background_light,
                         selectedIndicatorColor = background_light,
@@ -179,7 +174,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
             topBar = {
                 TopAppBar(
                     title = { Text(
-                        text = "Bienvenido ${usuario?.nombre}",
+                        text = "Home",
                         fontFamily = FontFamily.Default,
                         fontWeight = FontWeight.Normal,
                         fontSize = 22.sp,
