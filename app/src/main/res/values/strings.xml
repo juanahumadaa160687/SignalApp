@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">signal</string>
     <string name="google_maps_key" translatable="false">AIzaSyBjBSSOZWsyhtQzwGn0h295kpr2OWcizDY</string>
-    <string name="default_web_client_id" translatable="false">1051418229242-sou9ahd5ibb1sn2pog8crr2gpjvb9i1h.apps.googleusercontent.com</string>
 </resources>
