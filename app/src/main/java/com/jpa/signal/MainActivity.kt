@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    //Función que se ejecuta al iniciar la actividad, comprueba si el usuario está autenticado, si no lo está, cierra la sesión.
+    //Función que se ejecuta al iniciar la actividad, comprueba si el usuario está autenticado, si lo está, cierra la sesión.
     override fun onStart(){
         super.onStart()
         val currentUser = auth.currentUser

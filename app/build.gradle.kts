@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.realtime)
+    implementation(libs.googleid)
 
 
     implementation(libs.maps.compose)

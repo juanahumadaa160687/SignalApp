@@ -17,6 +17,7 @@ import com.jpa.signal.screens.SignInScreen
 import com.jpa.signal.screens.SignUpScreen
 import com.jpa.signal.screens.HomeScreen
 import com.jpa.signal.screens.ResetPasswordScreen
+import com.jpa.signal.screens.SignUpGoogle
 import com.jpa.signal.screens.TextToAudio
 import com.jpa.signal.screens.UserProfileScreen
 
@@ -33,13 +34,16 @@ fun NavigationWrapper(navHostController: NavHostController, auth: FirebaseAuth) 
 
     NavHost(navHostController, startDestination = "initial") {
         composable("initial") {
-            InitialScreen(navHostController)
+            InitialScreen(navHostController, auth)
         }
         composable("sign-in") {
             SignInScreen(navHostController, auth)
         }
         composable("sign-up") {
             SignUpScreen(navHostController, auth)
+        }
+        composable("sign-up-google") {
+            SignUpGoogle(navHostController, auth)
         }
         composable("home") {
             HomeScreen(navHostController, auth)
