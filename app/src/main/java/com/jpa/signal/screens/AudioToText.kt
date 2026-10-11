@@ -97,7 +97,7 @@ fun AudioToText(navHostController: NavHostController, auth: FirebaseAuth) {
             route = "text-to-audio"
         ),
         NavItem(
-            title = "Salir",
+            title = "Cerrar\nSesión",
             function = { auth.signOut(); navHostController.navigate("initial") },
             icon = R.drawable.ic_sign_out,
             route = ""
