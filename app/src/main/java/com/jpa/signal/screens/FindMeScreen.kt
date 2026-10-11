@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
@@ -28,6 +30,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +54,7 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Marker
@@ -58,6 +62,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.jpa.signal.R
 import com.jpa.signal.data.NavItem
 import com.jpa.signal.ui.theme.background_light
+import com.jpa.signal.ui.theme.primary_light
 import com.jpa.signal.ui.theme.tertiary_light
 import kotlinx.coroutines.launch
 
@@ -81,7 +86,7 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
 
     //Variable para la cámara
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(-20.21492183013291, -70.13583108234238), 20f)
+        position = CameraPosition.fromLatLngZoom(LatLng(-20.215391, -70.135896), 20f)
     }
 
     //Variable para el marcador
@@ -103,7 +108,7 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
         markerState = MarkerState(position = latLng)
         scope.launch {
           cameraPositionState.animate(
-              CameraUpdateFactory.newLatLngZoom(latLng, 10f)
+              CameraUpdateFactory.newLatLngZoom(latLng, 20f)
           )
         }
     }
@@ -129,6 +134,10 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
         }
     }
 
+    LaunchedEffect(Unit) {
+        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+
     val navItems = listOf(
         NavItem(
             title = "Home",
@@ -137,23 +146,23 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
             route = "home"
         ),
         NavItem(
-            title = "Voz a Texto",
+            title = "Voz a\nTexto",
             function = { navHostController.navigate("audio-to-text") },
             icon = R.drawable.ic_microphone,
             route = "audio-to-text"
         ),
         NavItem(
-            title = "Texto a Voz",
+            title = "Texto a\nVoz",
             function = { navHostController.navigate("text-to-audio") },
             icon = R.drawable.ic_speaker,
             route = "text-to-audio"
         ),
         NavItem(
-            title = "Salir",
+            title = "Cerrar\nSesión",
             function = { auth.signOut(); navHostController.navigate("initial") },
             icon = R.drawable.ic_sign_out,
             route = ""
-        )
+        ),
     )
 
     val state = rememberNavigationSuiteScaffoldState()
@@ -200,8 +209,11 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     },
                     selected = navHostController.currentDestination?.route == item.route,
                     colors = NavigationItemColors(
-                        selectedTextColor = background_light,
-                        selectedIconColor = tertiary_light,
+                        selectedTextColor = when{
+                            currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> background_light
+                            else -> primary_light
+                        },
+                        selectedIconColor = primary_light,
                         unselectedTextColor = background_light,
                         unselectedIconColor = background_light,
                         selectedIndicatorColor = background_light,
@@ -210,7 +222,7 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
                     ),
                     modifier = when {
                         currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.padding(top = 12.dp)
-                        else -> Modifier.padding(top = 4.dp, bottom = 4.dp)
+                        else -> Modifier.padding(top = 4.dp, bottom = 4.dp, end = 12.dp)
                     }
                 )
             }
@@ -221,78 +233,111 @@ fun FindMeScreen(navHostController: NavHostController, auth: FirebaseAuth){
             containerColor = background_light,
 
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Encuéntrame",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = background_light
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = tertiary_light
-                    ),
-                    navigationIcon = {
-                        IconButton(onClick = { navHostController.popBackStack() }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_back),
-                                contentDescription = "Volver",
-                                tint = background_light,
-                                modifier = Modifier.requiredSize(24.dp)
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = { navHostController.navigate("user-profile") }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_user),
-                                contentDescription = "Perfil de Usuario",
-                                tint = background_light,
-                                modifier = Modifier.requiredSize(24.dp)
-                            )
+                when {
+                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = "Encuéntrame",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = background_light
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = tertiary_light
+                            ),
+                            navigationIcon = {
+                                IconButton(onClick = { navHostController.popBackStack() }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_back),
+                                        contentDescription = "Volver",
+                                        tint = background_light,
+                                        modifier = Modifier.requiredSize(24.dp)
+                                    )
+                                }
+                            },
+                            actions = {
+                                IconButton(
+                                    onClick = { navHostController.navigate("user-profile") }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_user),
+                                        contentDescription = "Perfil de Usuario",
+                                        tint = background_light,
+                                        modifier = Modifier.requiredSize(24.dp)
+                                    )
 
-                        }
+                                }
+                            },
+                            modifier = when{
+                                currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.height(150.dp)
+                                else -> Modifier.height(80.dp)
+                            }
+                        )
                     }
-                )
+                    else -> {}
+                }
             }
 
         ) {innerPadding ->
+
             Column(
-                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                modifier =
+                    when {
+                        currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.padding(innerPadding).fillMaxSize()
+                        else -> Modifier.fillMaxSize()
+                    },
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    //Servicio de ubicación
-                    GoogleMap(
-                        modifier = Modifier.fillMaxSize(),
-                        cameraPositionState = cameraPositionState,
-                        properties = MapProperties(
-                            isMyLocationEnabled = hasLocationPermission
+                //Servicio de ubicación
+                GoogleMap(
+                    cameraPositionState = cameraPositionState,
+                    properties = MapProperties(
+                        isMyLocationEnabled = hasLocationPermission,
+                        mapType = MapType.NORMAL
+                    ),
+                    uiSettings = MapUiSettings(
+                        compassEnabled = true,
+                        indoorLevelPickerEnabled = true,
+                        mapToolbarEnabled = true,
+                        myLocationButtonEnabled = true,
+                        zoomControlsEnabled = true,
+                        zoomGesturesEnabled = true,
+                        scrollGesturesEnabled = true,
+                        tiltGesturesEnabled = true,
+                        rotationGesturesEnabled = true,
+                        scrollGesturesEnabledDuringRotateOrZoom = true
                         ),
-                        uiSettings = MapUiSettings(
-                            zoomControlsEnabled = true,
-                            myLocationButtonEnabled = true,
-                            mapToolbarEnabled = true,
-                            compassEnabled = true
-                        )
-                    ) {
-                        //Opción de marcador
-                        markerState?.let { state ->
-                            Marker(
-                                state = state,
-                                title = "Mi ubicación",
-                                snippet = "Aquí estoy: ${userLatLng?.latitude}, ${userLatLng?.longitude}",
-                                draggable = true,
-                                icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_marker),
-                                visible = true
-                            )
+                    onMapClick = { latLng ->
+                        updateMapCamera(latLng)
+                    },
+                    onMapLongClick = { latLng ->
+                        updateMapCamera(latLng)
+                    },
+                    onMapLoaded = {
+                        scope.launch {
+                            fusedLocationClient.getCurrentLocation(
+                                Priority.PRIORITY_HIGH_ACCURACY,
+                                CancellationTokenSource().token
+                            ).addOnSuccessListener { location: Location? ->
+                                location?.let {
+                                    updateMapCamera(LatLng(it.latitude, it.longitude))
+                                }
+                            }
                         }
+                    }
+                ) {
+                    //Opción de marcador
+                    markerState?.let { state ->
+                        Marker(
+                            state = state,
+                            title = "Mi ubicación",
+                            snippet = "Aquí estoy: ${userLatLng?.latitude}, ${userLatLng?.longitude}",
+                            draggable = true,
+                            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
+                            visible = true,
+                        )
                     }
                 }
             }

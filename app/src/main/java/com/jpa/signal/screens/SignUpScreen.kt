@@ -199,8 +199,7 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth) {
 
     ) {innerPadding ->
 
-        Column(modifier = Modifier
-            .padding(innerPadding),
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -515,7 +514,12 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                     Spacer(modifier = Modifier.height(40.dp))
 
                     Column(
-                        modifier = Modifier.selectableGroup(),
+                        modifier =
+                            when{
+                                currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth().selectableGroup()
+                                else -> Modifier.fillMaxWidth(0.5f).selectableGroup()
+
+                            },
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -784,6 +788,8 @@ fun SignUpScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                     }
                 }
                 item {
+                    Spacer(modifier = Modifier.height(24.dp))
+
                     TextButton(
                         onClick = { navHostController.navigate("sign-in") },
                         modifier = Modifier.fillMaxWidth()

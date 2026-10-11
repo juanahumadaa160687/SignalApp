@@ -107,19 +107,19 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
             route = "home"
         ),
         NavItem(
-            title = "Voz a Texto",
+            title = "Voz a\nTexto",
             function = { navHostController.navigate("audio-to-text") },
             icon = R.drawable.ic_microphone,
             route = "audio-to-text"
         ),
         NavItem(
-            title = "Texto a Voz",
+            title = "Texto a\nVoz",
             function = { navHostController.navigate("text-to-audio") },
             icon = R.drawable.ic_speaker,
             route = "text-to-audio"
         ),
         NavItem(
-            title = "Salir",
+            title = "Cerrar\nSesión",
             function = { auth.signOut(); navHostController.navigate("initial") },
             icon = R.drawable.ic_sign_out,
             route = ""
@@ -227,8 +227,11 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                     },
                     selected = navHostController.currentDestination?.route == item.route,
                     colors = NavigationItemColors(
-                        selectedTextColor = background_light,
-                        selectedIconColor = tertiary_light,
+                        selectedTextColor = when{
+                            currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> background_light
+                            else -> primary_light
+                        },
+                        selectedIconColor = primary_light,
                         unselectedTextColor = background_light,
                         unselectedIconColor = background_light,
                         selectedIndicatorColor = background_light,
@@ -237,7 +240,7 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
                     ),
                     modifier = when {
                         currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.padding(top = 12.dp)
-                        else -> Modifier.padding(top = 4.dp, bottom = 4.dp)
+                        else -> Modifier.padding(top = 4.dp, bottom = 4.dp, end = 12.dp)
                     }
                 )
             }
@@ -248,45 +251,49 @@ fun EditProfileScreen(navHostController: NavHostController, auth: FirebaseAuth) 
             containerColor = background_light,
 
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Perfil de Usuario",
-                            fontFamily = FontFamily.Default,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 22.sp,
-                            lineHeight = 28.sp,
-                            letterSpacing = 0.sp,
-                            color = background_light,
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = primary_light
-                    ),
-                    navigationIcon = {
-                        IconButton(onClick = { navHostController.popBackStack() }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_back),
-                                contentDescription = "Volver",
-                                tint = background_light,
-                                modifier = Modifier.requiredSize(24.dp)
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = { navHostController.navigate("user-profile") }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_user),
-                                contentDescription = "Perfil de Usuario",
-                                tint = background_light,
-                                modifier = Modifier.requiredSize(32.dp)
-                            )
+                when {
+                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 ->
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = "Editar Perfil de Usuario",
+                                    fontFamily = FontFamily.Default,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 22.sp,
+                                    lineHeight = 28.sp,
+                                    letterSpacing = 0.sp,
+                                    color = background_light,
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = primary_light
+                            ),
+                            navigationIcon = {
+                                IconButton(onClick = { navHostController.popBackStack() }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_back),
+                                        contentDescription = "Volver",
+                                        tint = background_light,
+                                        modifier = Modifier.requiredSize(24.dp)
+                                    )
+                                }
+                            },
+                            actions = {
+                                IconButton(
+                                    onClick = { navHostController.navigate("user-profile") }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_user),
+                                        contentDescription = "Perfil de Usuario",
+                                        tint = background_light,
+                                        modifier = Modifier.requiredSize(32.dp)
+                                    )
 
-                        }
-                    }
-                )
+                                }
+                            }
+                        )
+                    else -> {}
+                }
             }
 
         ) { innerPadding ->

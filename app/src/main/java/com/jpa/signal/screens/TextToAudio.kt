@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -139,19 +140,19 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
             route = "home"
         ),
         NavItem(
-            title = "Voz a Texto",
+            title = "Voz a\nTexto",
             function = { navHostController.navigate("audio-to-text") },
             icon = R.drawable.ic_microphone,
             route = "audio-to-text"
         ),
         NavItem(
-            title = "Texto a Voz",
+            title = "Texto a\nVoz",
             function = { navHostController.navigate("text-to-audio") },
             icon = R.drawable.ic_speaker,
             route = "text-to-audio"
         ),
         NavItem(
-            title = "Salir",
+            title = "Cerrar\nSesión",
             function = { auth.signOut(); navHostController.navigate("initial") },
             icon = R.drawable.ic_sign_out,
             route = ""
@@ -201,8 +202,11 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
                     },
                     selected = navHostController.currentDestination?.route == item.route,
                     colors = NavigationItemColors(
-                        selectedTextColor = background_light,
-                        selectedIconColor = tertiary_light,
+                        selectedTextColor = when{
+                            currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> background_light
+                            else -> primary_light
+                        },
+                        selectedIconColor = primary_light,
                         unselectedTextColor = background_light,
                         unselectedIconColor = background_light,
                         selectedIndicatorColor = background_light,
@@ -211,7 +215,7 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
                     ),
                     modifier = when {
                         currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.padding(top = 12.dp)
-                        else -> Modifier.padding(top = 4.dp, bottom = 4.dp)
+                        else -> Modifier.padding(top = 4.dp, bottom = 4.dp, end = 12.dp)
                     }
                 )
             }
@@ -222,45 +226,49 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
             containerColor = background_light,
 
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Texto a Voz",
-                            fontFamily = FontFamily.Default,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 22.sp,
-                            lineHeight = 28.sp,
-                            letterSpacing = 0.sp,
-                            color = background_light
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = primary_light
-                    ),
-                    navigationIcon = {
-                        IconButton(onClick = { navHostController.popBackStack() }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_back),
-                                contentDescription = "Volver",
-                                tint = background_light,
-                                modifier = Modifier.requiredSize(24.dp)
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = { navHostController.navigate("user-profile") }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_user),
-                                contentDescription = "Perfil de Usuario",
-                                tint = background_light,
-                                modifier = Modifier.requiredSize(32.dp)
-                            )
+                when {
+                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 ->
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = "Texto a Audio",
+                                    fontFamily = FontFamily.Default,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 22.sp,
+                                    lineHeight = 28.sp,
+                                    letterSpacing = 0.sp,
+                                    color = background_light,
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = primary_light
+                            ),
+                            navigationIcon = {
+                                IconButton(onClick = { navHostController.popBackStack() }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_back),
+                                        contentDescription = "Volver",
+                                        tint = background_light,
+                                        modifier = Modifier.requiredSize(24.dp)
+                                    )
+                                }
+                            },
+                            actions = {
+                                IconButton(
+                                    onClick = { navHostController.navigate("user-profile") }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_user),
+                                        contentDescription = "Perfil de Usuario",
+                                        tint = background_light,
+                                        modifier = Modifier.requiredSize(32.dp)
+                                    )
 
-                        }
-                    }
-                )
+                                }
+                            }
+                        )
+                    else -> {}
+                }
             }
 
         ) { innerPadding ->
@@ -284,7 +292,7 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
                         ) {TextField(
                             value = textToSpeak,
                             onValueChange = { textToSpeak = it },
-                            placeholder = { Text("Ingrese el texto a convertir en audio") },
+                            placeholder = { Text("Texto a convertir en audio") },
                             modifier =
                                 when{
                                     currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
@@ -358,19 +366,34 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
 
                     item{
                         Spacer(modifier = Modifier.padding(20.dp))
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+
+                        ) {
+                            Text(
+                                text = "Frases Predefinidas",
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 24.sp,
+                                lineHeight = 36.sp,
+                                letterSpacing = 0.sp,
+                                color = primary_light,
+                            )
+                        }
 
                         userPhrases.forEach { phrase ->
 
                             Column(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
 
                             ) {
                                 Text(
-                                    text = phrase,
+                                    text = "- $phrase",
                                     fontFamily = FontFamily.Default,
                                     fontWeight = FontWeight.Normal,
-                                    fontSize = 28.sp,
+                                    fontSize = 20.sp,
                                     lineHeight = 36.sp,
                                     letterSpacing = 0.sp,
                                     color = primary_light,
@@ -387,11 +410,27 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
 
                     item{
                         Spacer(modifier = Modifier.padding(20.dp))
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            HorizontalDivider(
+                                modifier = Modifier.fillMaxWidth(0.5f),
+                                color = primary_light,
+                                thickness = 1.dp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.padding(16.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
                             //Agregar nueva frase preefinida
                             TextField(
                                 value = phraseState,
@@ -453,24 +492,29 @@ fun TextToAudio(navHostController: NavHostController, auth: FirebaseAuth){
                     item{
                         Spacer(modifier = Modifier.padding(16.dp))
 
-                        Button(
-                            onClick = {
-                                val userUid = currentUser?.uid
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Button(
+                                onClick = {
+                                    val userUid = currentUser?.uid
 
-                                scope.launch {
-                                    FrasesRepo.deleteFrase(userUid!!)
-                                    navHostController.navigate("text-to-audio")
-                                }
-                            },
-                            modifier = when {
-                                currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth().height(56.dp)
-                                else -> Modifier.fillMaxWidth(0.5f).height(56.dp)
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Red
-                            )
-                        ){
-                            Text(text = "Limpiar")
+                                    scope.launch {
+                                        FrasesRepo.deleteFrase(userUid!!)
+                                        navHostController.navigate("text-to-audio")
+                                    }
+                                },
+                                modifier = when {
+                                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth().height(56.dp)
+                                    else -> Modifier.fillMaxWidth(0.5f).height(56.dp)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Red
+                                )
+                            ){
+                                Text(text = "Limpiar")
+                            }
                         }
                     }
                 }

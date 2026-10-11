@@ -3,6 +3,7 @@ package com.jpa.signal.screens
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -122,8 +124,8 @@ fun ForgotPasswordScreen(navHostController: NavHostController, auth: FirebaseAut
     ) {innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
            Column(
                modifier = Modifier.padding(16.dp).fillMaxSize(),
@@ -177,7 +179,28 @@ fun ForgotPasswordScreen(navHostController: NavHostController, auth: FirebaseAut
                    },
                )
 
-               Spacer(modifier = Modifier.size(20.dp))
+               Row(
+                   when {
+                       currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
+                       else -> Modifier.fillMaxWidth(0.5f)
+                   },
+                   horizontalArrangement = Arrangement.End,
+                   verticalAlignment = Alignment.CenterVertically,
+               ) {
+                   Text(
+                       text = "Ingresa tu correo electrónico para restablecer tu contraseña.",
+                       fontFamily = FontFamily.Default,
+                       fontWeight = FontWeight.Normal,
+                       fontSize = 16.sp,
+                       lineHeight = 20.sp,
+                       letterSpacing = 0.sp,
+                       color = MaterialTheme.colorScheme.primary,
+                       modifier = Modifier.padding(top = 8.dp),
+                       textAlign = TextAlign.End
+                   )
+               }
+
+               Spacer(modifier = Modifier.size(28.dp))
 
                Button(
                    onClick = {

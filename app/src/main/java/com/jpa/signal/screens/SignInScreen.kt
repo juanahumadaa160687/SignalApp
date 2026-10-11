@@ -23,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecureTextField
 import androidx.compose.material3.Text
@@ -32,6 +33,12 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
+import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.jpa.signal.R
+import com.jpa.signal.data.NavItem
 import com.jpa.signal.data.Usuario
 import com.jpa.signal.data.UsuarioRepo
 import com.jpa.signal.ui.theme.app_error
@@ -73,6 +82,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
 
+    //Variable para el Scaffold que contiene la Navigation Suite para mostrar una barra de navegación de acuerdo con el tamaño de la pantalla
+    val state = rememberNavigationSuiteScaffoldState()
+
     /*
     Variables para el inicio de sesión
     email: Correo electrónico del usuario
@@ -88,6 +100,8 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
     var text by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
+
+    val scopeTopBar = rememberCoroutineScope()
 
     var usuario: Usuario by remember { mutableStateOf(Usuario()) }
 
@@ -174,7 +188,6 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = primary_light
                 ),
-
                 navigationIcon = {
                     IconButton(onClick = { navHostController.navigate("initial") }) {
                         Icon(
@@ -192,8 +205,8 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
 
         Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             LazyColumn(
@@ -215,10 +228,10 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }.border(
-                            width = 1.dp,
-                            color = primary_light,
-                            shape = MaterialTheme.shapes.large
-                        ),
+                                width = 1.dp,
+                                color = primary_light,
+                                shape = MaterialTheme.shapes.large
+                            ),
                         shape = MaterialTheme.shapes.large,
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = background_light,
@@ -270,7 +283,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 width = 1.dp,
                                 color = primary_light,
                                 shape = MaterialTheme.shapes.large
-                        ),
+                            ),
                         shape = MaterialTheme.shapes.large,
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = background_light,
@@ -350,9 +363,9 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                             openAlertDialog.value = true
                                         }
                                     }
-                                } else {
-                                    text = "Por favor, ingrese un correo electrónico y una contraseña."
-                                    openAlertDialog.value = true
+                            } else {
+                                text = "Por favor, ingrese un correo electrónico y una contraseña."
+                                openAlertDialog.value = true
                             }
                         },
                         // Modificador que permite ajustar el tamaño del Botón de acuerdo a la orientación de la pantalla
@@ -361,7 +374,7 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
                                 currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.fillMaxWidth()
                                 else -> Modifier.fillMaxWidth(0.5f)
                             }
-                            .height(56.dp),
+                                .height(56.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = primary_light
                         )
@@ -390,4 +403,5 @@ fun SignInScreen(navHostController: NavHostController, auth: FirebaseAuth){
             }
         }
     }
+
 }

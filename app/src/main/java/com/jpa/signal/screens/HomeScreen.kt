@@ -161,7 +161,7 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
                     ),
                     modifier = when {
                         currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.padding(top = 12.dp)
-                        else -> Modifier.padding(top = 4.dp, bottom = 4.dp)
+                        else -> Modifier.padding(top = 4.dp, bottom = 4.dp, end = 12.dp)
                     }
                 )
             }
@@ -172,50 +172,60 @@ fun HomeScreen(navHostController: NavHostController, auth: FirebaseAuth) {
             containerColor = background_light,
 
             topBar = {
-                TopAppBar(
-                    title = { Text(
-                        text = "Home",
-                        fontFamily = FontFamily.Default,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 22.sp,
-                        lineHeight = 28.sp,
-                        letterSpacing = 0.sp,
-                        color = background_light
-                    )},
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = primary_light
-                    ),
-                    navigationIcon = {
-                        IconButton(onClick = { navHostController.popBackStack() }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_back),
-                                contentDescription = "Volver",
-                                tint = background_light,
-                                modifier = Modifier.requiredSize(24.dp)
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = { navHostController.navigate("user-profile") }
-                        ){
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_user),
-                                contentDescription = "Perfil de Usuario",
-                                tint = background_light,
-                                modifier = Modifier.requiredSize(32.dp)
-                            )
+                when {
+                    currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 ->
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = "Home",
+                                    fontFamily = FontFamily.Default,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 22.sp,
+                                    lineHeight = 28.sp,
+                                    letterSpacing = 0.sp,
+                                    color = background_light,
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = primary_light
+                            ),
+                            navigationIcon = {
+                                IconButton(onClick = { navHostController.popBackStack() }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_back),
+                                        contentDescription = "Volver",
+                                        tint = background_light,
+                                        modifier = Modifier.requiredSize(24.dp)
+                                    )
+                                }
+                            },
+                            actions = {
+                                IconButton(
+                                    onClick = { navHostController.navigate("user-profile") }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_user),
+                                        contentDescription = "Perfil de Usuario",
+                                        tint = background_light,
+                                        modifier = Modifier.requiredSize(32.dp)
+                                    )
 
-                        }
-                    }
-                )
+                                }
+                            }
+                        )
+                    else -> {}
+                }
             }
 
         ) {innerPadding ->
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(innerPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                modifier =
+                    when {
+                        currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp <= 800 -> Modifier.padding(innerPadding).fillMaxSize()
+                        else -> Modifier.fillMaxSize()
+                    },
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 item{
                     Grid(
